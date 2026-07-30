@@ -1,0 +1,113 @@
+# =========================
+# Dependencies
+# =========================
+node_modules/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+!.env.example
+!.env*.example
+
+# =========================
+# Build outputs
+# =========================
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# Testing & coverage
+# =========================
+coverage/
+.nyc_output/
+*.lcov
+
+# =========================
+# Caches
+# =========================
+.cache/
+.parcel-cache/
+.eslintcache
+.prettiercache
+.turbo/
+*.local
+
+# =========================
+# Runtime & temp files
+# =========================
+tmp/
+temp/
+*.pid
+*.seed
+
+# =========================
+# Database (local/dev)
+# =========================
+*.sqlite
+*.sqlite3
+*.db
+pgdata/
+postgres-data/
+
+# Drizzle Kit local state (migrations sí se commitean)
+.drizzle/
+
+# =========================
+# Docker (overrides locales)
+# =========================
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =========================
+# IDE / editors
+# =========================
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# VS Code / Cursor — ignorar config personal, mantener recomendaciones del equipo
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# =========================
+# Misc
+# =========================
+*.pem
+*.key
+*.cert
+*.crt
+
+notas.md
