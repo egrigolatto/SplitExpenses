@@ -11,6 +11,16 @@ export default [
         project: "./tsconfig.eslint.json",
       },
     },
+    rules: {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+    },
   },
   {
     ignores: ["dist", "node_modules"],
