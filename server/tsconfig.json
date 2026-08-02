@@ -18,7 +18,9 @@
 
     "noUncheckedIndexedAccess": true,
 
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+
+    "types": ["node"]
   },
 
   "include": ["src"]
