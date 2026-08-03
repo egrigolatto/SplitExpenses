@@ -8,6 +8,13 @@
       "when": 1785683254114,
       "tag": "0000_milky_annihilus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785758292961,
+      "tag": "0001_lush_zombie",
+      "breakpoints": true
     }
   ]
 }
