@@ -1,9 +1,26 @@
 import type { RequestHandler } from "express";
-import { z } from "zod";
+import type { ZodType } from "zod";
 
-export function validate<T extends z.ZodType>(schema: T): RequestHandler {
+interface ValidationSchemas {
+  body?: ZodType;
+  params?: ZodType;
+  query?: ZodType;
+}
+
+export function validate(schemas: ValidationSchemas): RequestHandler {
   return (req, _res, next) => {
-    req.body = schema.parse(req.body);
+    if (schemas.body) {
+      req.body = schemas.body.parse(req.body) as typeof req.body;
+    }
+
+    if (schemas.params) {
+      req.params = schemas.params.parse(req.params) as typeof req.params;
+    }
+
+    if (schemas.query) {
+      req.query = schemas.query.parse(req.query) as typeof req.query;
+    }
+
     next();
   };
 }
