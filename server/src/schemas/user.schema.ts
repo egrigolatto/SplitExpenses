@@ -7,3 +7,7 @@ export const createUserSchema = z.object({
 
   password: z.string().min(8).max(100),
 });
+
+export const userParamsSchema = z.object({
+  id: z.uuid(),
+});
