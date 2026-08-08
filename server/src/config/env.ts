@@ -1,9 +1,15 @@
 import dotenv from "dotenv";
+import { envSchema } from "../schemas/env.schema.js";
 
 dotenv.config();
 
+const parsedEnv = envSchema.parse(process.env);
+
 export const env = {
-  nodeEnv: process.env.NODE_ENV ?? "development",
-  port: Number(process.env.PORT) || 3000,
-  databaseUrl: process.env.DATABASE_URL ?? "",
+  nodeEnv: parsedEnv.NODE_ENV,
+  port: parsedEnv.PORT,
+  databaseUrl: parsedEnv.DATABASE_URL,
+  jwtSecret: parsedEnv.JWT_SECRET,
+  jwtExpiresIn: parsedEnv.JWT_EXPIRES_IN,
+  cookieName: parsedEnv.COOKIE_NAME,
 };

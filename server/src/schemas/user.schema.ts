@@ -11,3 +11,5 @@ export const createUserSchema = z.object({
 export const userParamsSchema = z.object({
   id: z.uuid(),
 });
+
+export type CreateUserDto = z.infer<typeof createUserSchema>;

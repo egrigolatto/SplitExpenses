@@ -1,19 +1,20 @@
 import argon2 from "argon2";
 import { AppError } from "../errors/app-error.js";
 import { UserRepository } from "../repositories/user.repository.js";
+import { generateAccessToken } from "../lib/jwt.js";
+import { CreateUserDto } from "../schemas/user.schema.js";
+import { LoginDto } from "../schemas/auth.schema.js";
 
 export class AuthService {
   constructor(private readonly repository: UserRepository) {}
 
-  registerUser = async ({
-    name,
-    email,
-    password,
-  }: {
-    name: string;
-    email: string;
-    password: string;
-  }) => {
+  private sanitizeUser<T extends { passwordHash?: string | null }>(user: T) {
+    const { passwordHash: _passwordHash, ...safeUser } = user;
+    return safeUser;
+  }
+
+  async registerUser(dto: CreateUserDto) {
+    const { name, email, password } = dto;
     const existingUser = await this.repository.findByEmail(email);
 
     if (existingUser) {
@@ -28,6 +29,30 @@ export class AuthService {
       passwordHash,
     });
 
-    return user;
-  };
+    if (!user) {
+      throw new AppError(500, "User could not be created");
+    }
+
+    return this.sanitizeUser(user);
+  }
+
+  async loginUser(dto: LoginDto) {
+    const { email, password } = dto;
+    const user = await this.repository.findByEmail(email);
+
+    if (!user || !user.passwordHash) {
+      throw new AppError(401, "Invalid credentials");
+    }
+
+    const isPasswordValid = await argon2.verify(user.passwordHash, password);
+
+    if (!isPasswordValid) {
+      throw new AppError(401, "Invalid credentials");
+    }
+
+    const accessToken = generateAccessToken({ sub: user.id });
+    const safeUser = this.sanitizeUser(user);
+
+    return { user: safeUser, accessToken };
+  }
 }
