@@ -7,6 +7,6 @@ app.listen(env.port, () => {
     {
       port: env.port,
     },
-    "Server started",
+    `Server started in http://localhost:${env.port}`,
   );
 });
