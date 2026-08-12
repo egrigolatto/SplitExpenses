@@ -4,9 +4,11 @@ import healthRoutes from "./routes/health.routes.js";
 import usersRoutes from "./routes/users.routes.js";
 import authRoutes from "./auth/auth.routes.js";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 
 const app = express();
 
+app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 
