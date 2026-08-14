@@ -1,5 +1,6 @@
 import { pgTable, uuid, varchar, date, numeric, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./users.js";
+import { sql } from "drizzle-orm";
 
 export const meetings = pgTable("meetings", {
   id: uuid().defaultRandom().primaryKey(),
@@ -12,7 +13,9 @@ export const meetings = pgTable("meetings", {
 
   name: varchar({ length: 100 }).notNull(),
 
-  meetingDate: date().notNull(),
+  meetingDate: date()
+    .default(sql`CURRENT_DATE`)
+    .notNull(),
 
   totalAmount: numeric({
     precision: 10,

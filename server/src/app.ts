@@ -3,6 +3,8 @@ import { errorHandler } from "./middlewares/error-handler.js";
 import healthRoutes from "./routes/health.routes.js";
 import usersRoutes from "./routes/users.routes.js";
 import authRoutes from "./auth/auth.routes.js";
+import meetingRoutes from "./routes/meeting.routes.js";
+
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 
@@ -17,6 +19,8 @@ app.use("/health", healthRoutes);
 app.use("/auth", authRoutes);
 
 app.use("/users", usersRoutes);
+
+app.use("/meetings", meetingRoutes);
 
 app.use(errorHandler);
 
