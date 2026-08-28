@@ -20,4 +20,66 @@ export class MeetingController {
       next(error);
     }
   }
+
+  async findAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new AppError(401, "Unauthorized");
+      }
+
+      const result = await this.service.findAll(userId);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async findById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new AppError(401, "Unauthorized");
+      }
+      const meetingId = req.params.id as string;
+      if (!meetingId) {
+        throw new AppError(400, "Meeting ID is required");
+      }
+      const result = await this.service.findById(meetingId, userId);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new AppError(401, "Unauthorized");
+      }
+
+      const meetingId = req.params.id as string;
+      const result = await this.service.update(meetingId, userId, req.body);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new AppError(401, "Unauthorized");
+      }
+
+      const meetingId = req.params.id as string;
+      await this.service.delete(meetingId, userId);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
