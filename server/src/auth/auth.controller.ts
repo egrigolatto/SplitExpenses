@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../auth/auth.service.js";
 import { UserService } from "../services/users.service.js";
+import { setAuthCookie, clearAuthCookie } from "../lib/cookies.js";
 
 export class AuthController {
   constructor(
@@ -25,16 +26,23 @@ export class AuthController {
     try {
       const { user, accessToken } = await this.authService.loginUser(req.body);
 
-      res.cookie("access_token", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      setAuthCookie(res, accessToken);
 
       res.status(200).json({
         success: true,
         user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async logout(_req: Request, res: Response, next: NextFunction) {
+    try {
+      clearAuthCookie(res);
+
+      res.status(200).json({
+        success: true,
       });
     } catch (error) {
       next(error);

@@ -12,4 +12,8 @@ export const env = {
   jwtSecret: parsedEnv.JWT_SECRET,
   jwtExpiresIn: parsedEnv.JWT_EXPIRES_IN,
   cookieName: parsedEnv.COOKIE_NAME,
+  googleClientId: parsedEnv.GOOGLE_CLIENT_ID,
+  googleClientSecret: parsedEnv.GOOGLE_CLIENT_SECRET,
+  googleRedirectUri: parsedEnv.GOOGLE_REDIRECT_URI,
+  frontendUrl: parsedEnv.FRONTEND_URL,
 };

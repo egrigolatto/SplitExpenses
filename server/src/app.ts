@@ -3,6 +3,7 @@ import { errorHandler } from "./middlewares/error-handler.js";
 import healthRoutes from "./routes/health.routes.js";
 import usersRoutes from "./routes/users.routes.js";
 import authRoutes from "./auth/auth.routes.js";
+import googleRoutes from "./auth/google.routes.js";
 import meetingRoutes from "./routes/meeting.routes.js";
 
 import cookieParser from "cookie-parser";
@@ -17,6 +18,8 @@ app.use(cookieParser());
 app.use("/health", healthRoutes);
 
 app.use("/auth", authRoutes);
+
+app.use("/auth/google", googleRoutes);
 
 app.use("/users", usersRoutes);
 

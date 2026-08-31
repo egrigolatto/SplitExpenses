@@ -25,5 +25,7 @@ router.post(
 
 router.post("/login", validate({ body: loginSchema }), authController.login.bind(authController));
 
+router.post("/logout", authController.logout.bind(authController));
+
 router.get("/me", authenticate, authController.getCurrentUser.bind(authController));
 export default router;
