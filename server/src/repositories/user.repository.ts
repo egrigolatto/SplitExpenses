@@ -15,6 +15,22 @@ export class UserRepository {
     });
   }
 
+  async findByGoogleId(googleId: string) {
+    return db.query.users.findFirst({
+      where: eq(users.googleId, googleId),
+    });
+  }
+
+  async linkGoogleId(id: string, googleId: string) {
+    const [user] = await db
+      .update(users)
+      .set({ googleId, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+
+    return user;
+  }
+
   async create(data: typeof users.$inferInsert) {
     const [user] = await db.insert(users).values(data).returning();
 
