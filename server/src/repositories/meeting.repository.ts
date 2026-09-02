@@ -2,7 +2,7 @@ import { meetings } from "../db/schema/meetings.js";
 import { participants } from "../db/schema/participants.js";
 import { db } from "../db/index.js";
 import { AppError } from "../errors/app-error.js";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 type ParticipantInput = Omit<typeof participants.$inferInsert, "meetingId">;
 type MeetingInput = typeof meetings.$inferInsert;
@@ -76,14 +76,7 @@ export class MeetingRepository {
       }
 
       if (data.participantList !== undefined) {
-        await tx.delete(participants).where(eq(participants.meetingId, id));
-
-        await tx.insert(participants).values(
-          data.participantList.map((participant) => ({
-            ...participant,
-            meetingId: id,
-          })),
-        );
+        await this.upsertParticipants(tx, id, data.participantList);
       }
 
       return tx.query.meetings.findFirst({
@@ -100,5 +93,53 @@ export class MeetingRepository {
       .returning();
 
     return meeting;
+  }
+
+  private async upsertParticipants(
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+    meetingId: string,
+    participantList: ParticipantInput[],
+  ) {
+    const existing = await tx
+      .select()
+      .from(participants)
+      .where(eq(participants.meetingId, meetingId));
+
+    const existingIds = new Set(existing.map((participant) => participant.id));
+
+    for (const participant of participantList) {
+      const { id, name, paidAmount, userId } = participant;
+
+      if (id && existingIds.has(id)) {
+        await tx
+          .update(participants)
+          .set({
+            name,
+            paidAmount,
+            ...(userId !== undefined && userId !== null && { userId }),
+            updatedAt: new Date(),
+          })
+          .where(eq(participants.id, id));
+      } else {
+        await tx.insert(participants).values({
+          meetingId,
+          name,
+          paidAmount,
+          ...(userId !== undefined && userId !== null && { userId }),
+        });
+      }
+    }
+
+    const incomingIds = participantList
+      .map((participant) => participant.id)
+      .filter((id): id is string => id !== undefined);
+
+    const idsToDelete = [...existingIds].filter((existingId) => !incomingIds.includes(existingId));
+
+    if (idsToDelete.length > 0) {
+      await tx
+        .delete(participants)
+        .where(and(eq(participants.meetingId, meetingId), inArray(participants.id, idsToDelete)));
+    }
   }
 }

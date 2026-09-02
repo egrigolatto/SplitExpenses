@@ -2,16 +2,12 @@ import argon2 from "argon2";
 import { AppError } from "../errors/app-error.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import { generateAccessToken } from "../lib/jwt.js";
+import { toPublicUser } from "../lib/user-serializer.js";
 import { CreateUserDto } from "../schemas/user.schema.js";
 import { LoginDto } from "../schemas/auth.schema.js";
 
 export class AuthService {
   constructor(private readonly repository: UserRepository) {}
-
-  private sanitizeUser<T extends { passwordHash?: string | null }>(user: T) {
-    const { passwordHash: _passwordHash, ...safeUser } = user;
-    return safeUser;
-  }
 
   private normalizeEmail(email: string) {
     return email.trim().toLowerCase();
@@ -38,7 +34,7 @@ export class AuthService {
       throw new AppError(500, "User could not be created");
     }
 
-    return this.sanitizeUser(user);
+    return toPublicUser(user);
   }
 
   async loginUser(dto: LoginDto) {
@@ -57,7 +53,7 @@ export class AuthService {
     }
 
     const accessToken = generateAccessToken({ sub: user.id });
-    const safeUser = this.sanitizeUser(user);
+    const safeUser = toPublicUser(user);
 
     return { user: safeUser, accessToken };
   }

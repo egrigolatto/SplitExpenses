@@ -6,6 +6,17 @@ import { serializeCreatedMeeting, serializeMeetingWithParticipants } from "../li
 export class MeetingService {
   constructor(private readonly repository: MeetingRepository) {}
 
+  private assertAmountsMatch(totalAmount: number, participants: { paidAmount: number }[]) {
+    const sum = participants.reduce((acc, participant) => acc + participant.paidAmount, 0);
+
+    if (Math.abs(sum - totalAmount) > 0.01) {
+      throw new AppError(
+        400,
+        `The sum of paid amounts (${sum.toFixed(2)}) does not match the total amount (${totalAmount.toFixed(2)})`,
+      );
+    }
+  }
+
   async createMeeting(ownerId: string, data: CreateMeetingDto) {
     if (data.participantList.length === 0) {
       throw new AppError(400, "A meeting must have at least one participant");
@@ -16,6 +27,8 @@ export class MeetingService {
     if (ownerParticipants.length !== 1) {
       throw new AppError(400, "Exactly one participant must be the owner");
     }
+
+    this.assertAmountsMatch(data.totalAmount, data.participantList);
 
     const result = await this.repository.create({
       meeting: {
@@ -58,6 +71,10 @@ export class MeetingService {
       if (ownerParticipants.length !== 1) {
         throw new AppError(400, "Exactly one participant must be the owner");
       }
+
+      if (data.totalAmount !== undefined) {
+        this.assertAmountsMatch(data.totalAmount, data.participantList);
+      }
     }
 
     const meeting = await this.repository.update(meetingId, userId, {
@@ -68,6 +85,7 @@ export class MeetingService {
       }),
       ...(data.participantList !== undefined && {
         participantList: data.participantList.map((participant) => ({
+          ...(participant.id !== undefined && { id: participant.id }),
           name: participant.name,
           paidAmount: String(participant.paidAmount),
           userId: participant.isOwner ? userId : undefined,

@@ -6,6 +6,7 @@ import { AppError } from "../errors/app-error.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import { getOAuth2Client } from "../lib/google-oauth.js";
 import { generateAccessToken } from "../lib/jwt.js";
+import { toPublicUser } from "../lib/user-serializer.js";
 import { env } from "../config/env.js";
 
 const GOOGLE_SCOPES = ["openid", "email", "profile"];
@@ -19,11 +20,6 @@ interface GoogleStatePayload {
 
 export class GoogleAuthService {
   constructor(private readonly repository: UserRepository) {}
-
-  private sanitizeUser<T extends { passwordHash?: string | null }>(user: T) {
-    const { passwordHash: _passwordHash, ...safeUser } = user;
-    return safeUser;
-  }
 
   async getAuthUrl() {
     const client = getOAuth2Client();
@@ -91,7 +87,7 @@ export class GoogleAuthService {
 
     const accessToken = generateAccessToken({ sub: user.id });
 
-    return { user: this.sanitizeUser(user), accessToken };
+    return { user: toPublicUser(user), accessToken };
   }
 
   private verifyState(state: string): GoogleStatePayload {

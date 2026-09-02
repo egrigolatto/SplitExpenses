@@ -76,6 +76,28 @@ describe("Meeting endpoints", () => {
         message: "Exactly one participant must be the owner",
       });
     });
+
+    it("should reject meetings whose paid amounts do not match the total", async () => {
+      const { agent } = await registerAndLogin();
+
+      const res = await agent
+        .post("/api/v1/meetings")
+        .send(
+          createMeetingPayload({
+            totalAmount: 1000,
+            participantList: [
+              { name: "Juan", paidAmount: 500, isOwner: true },
+              { name: "Pedro", paidAmount: 300, isOwner: false },
+            ],
+          }),
+        )
+        .expect(400);
+
+      expect(res.body).toMatchObject({
+        success: false,
+      });
+      expect(res.body.message).toContain("does not match the total amount");
+    });
   });
 
   describe("GET /api/v1/meetings", () => {
@@ -159,6 +181,30 @@ describe("Meeting endpoints", () => {
 
       expect(res.body.data.participants).toHaveLength(1);
       expect(res.body.data.participants[0].name).toBe("Solo");
+    });
+
+    it("should preserve participant ids when updating by id", async () => {
+      const { agent } = await registerAndLogin();
+
+      const created = await agent.post("/api/v1/meetings").send(createMeetingPayload());
+      const meetingId = created.body.data.meeting.id;
+      const originalParticipants = created.body.data.participants;
+      const firstId = originalParticipants[0].id;
+
+      const res = await agent
+        .patch(`/api/v1/meetings/${meetingId}`)
+        .send({
+          participantList: [
+            { id: firstId, name: "Juan Actualizado", paidAmount: 700, isOwner: true },
+            { name: "Nuevo", paidAmount: 300, isOwner: false },
+          ],
+        })
+        .expect(200);
+
+      expect(res.body.data.participants).toHaveLength(2);
+      expect(res.body.data.participants[0].id).toBe(firstId);
+      expect(res.body.data.participants[0].name).toBe("Juan Actualizado");
+      expect(res.body.data.participants[0].paidAmount).toBe(700);
     });
   });
 

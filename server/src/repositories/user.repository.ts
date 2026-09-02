@@ -31,6 +31,20 @@ export class UserRepository {
     return user;
   }
 
+  async update(id: string, data: { name?: string; email?: string }) {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.email !== undefined && { email: data.email }),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+
+    return user;
+  }
+
   async create(data: typeof users.$inferInsert) {
     const [user] = await db.insert(users).values(data).returning();
 
