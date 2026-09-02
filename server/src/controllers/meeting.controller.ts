@@ -15,7 +15,7 @@ export class MeetingController {
 
       const data = req.body as CreateMeetingDto;
       const result = await this.service.createMeeting(ownerId, data);
-      res.status(201).json(result);
+      res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -29,7 +29,7 @@ export class MeetingController {
       }
 
       const result = await this.service.findAll(userId);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -46,7 +46,7 @@ export class MeetingController {
         throw new AppError(400, "Meeting ID is required");
       }
       const result = await this.service.findById(meetingId, userId);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -61,7 +61,7 @@ export class MeetingController {
 
       const meetingId = req.params.id as string;
       const result = await this.service.update(meetingId, userId, req.body);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -81,5 +81,4 @@ export class MeetingController {
       next(error);
     }
   }
-
 }

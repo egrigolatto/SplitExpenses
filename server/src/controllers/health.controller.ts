@@ -7,6 +7,6 @@ export class HealthController {
   getHealth(_req: Request, res: Response) {
     const health = healthService.getStatus();
 
-    res.status(200).json(health);
+    res.status(200).json({ success: true, data: health });
   }
 }

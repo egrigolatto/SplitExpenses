@@ -28,10 +28,7 @@ export class GoogleAuthController {
     }
 
     try {
-      const { accessToken } = await this.googleAuthService.handleCallback(
-        code,
-        state,
-      );
+      const { accessToken } = await this.googleAuthService.handleCallback(code, state);
 
       setAuthCookie(res, accessToken);
 

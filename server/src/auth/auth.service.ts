@@ -13,8 +13,13 @@ export class AuthService {
     return safeUser;
   }
 
+  private normalizeEmail(email: string) {
+    return email.trim().toLowerCase();
+  }
+
   async registerUser(dto: CreateUserDto) {
-    const { name, email, password } = dto;
+    const { name, password } = dto;
+    const email = this.normalizeEmail(dto.email);
     const existingUser = await this.repository.findByEmail(email);
 
     if (existingUser) {
@@ -37,7 +42,8 @@ export class AuthService {
   }
 
   async loginUser(dto: LoginDto) {
-    const { email, password } = dto;
+    const { password } = dto;
+    const email = this.normalizeEmail(dto.email);
     const user = await this.repository.findByEmail(email);
 
     if (!user || !user.passwordHash) {

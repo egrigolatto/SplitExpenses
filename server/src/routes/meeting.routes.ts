@@ -25,11 +25,7 @@ router.post(
   controller.create.bind(controller),
 );
 
-router.get(
-  "/",
-  authenticate,
-  controller.findAll.bind(controller),
-);
+router.get("/", authenticate, controller.findAll.bind(controller));
 
 router.get(
   "/:id",

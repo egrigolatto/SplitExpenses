@@ -120,7 +120,8 @@ Respuesta
 {
   "success": true,
   "data": {
-    "status": "ok"
+    "status": "ok",
+    "timestamp": "2026-09-01T12:00:00.000Z"
   }
 }
 ```
@@ -183,8 +184,10 @@ Cookie HttpOnly + usuario autenticado.
 {
   "success": true,
   "data": {
-    "id": "...",
-    "name": "Juan Pérez"
+    "user": {
+      "id": "...",
+      "name": "Juan Pérez"
+    }
   }
 }
 ```
@@ -333,7 +336,7 @@ Elimina una reunión.
   "errors": [
     {
       "field": "name",
-      "message": "Name is required"
+      "message": "String must contain at least 2 character(s)"
     }
   ]
 }

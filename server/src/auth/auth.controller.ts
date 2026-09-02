@@ -15,7 +15,7 @@ export class AuthController {
 
       res.status(201).json({
         success: true,
-        user,
+        data: user,
       });
     } catch (error) {
       next(error);
@@ -30,7 +30,9 @@ export class AuthController {
 
       res.status(200).json({
         success: true,
-        user,
+        data: {
+          user,
+        },
       });
     } catch (error) {
       next(error);
@@ -54,7 +56,7 @@ export class AuthController {
       const user = await this.userService.findById(req.user!.id);
       res.json({
         success: true,
-        user: user,
+        data: user,
       });
     } catch (error) {
       next(error);

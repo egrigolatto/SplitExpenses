@@ -7,7 +7,6 @@ import { and, eq } from "drizzle-orm";
 type ParticipantInput = Omit<typeof participants.$inferInsert, "meetingId">;
 type MeetingInput = typeof meetings.$inferInsert;
 export class MeetingRepository {
-  
   async create(data: { meeting: MeetingInput; participantList: ParticipantInput[] }) {
     return db.transaction(async (tx) => {
       const [newMeeting] = await tx.insert(meetings).values(data.meeting).returning();
@@ -34,10 +33,7 @@ export class MeetingRepository {
   }
   async findById(id: string, ownerId: string) {
     return db.query.meetings.findFirst({
-      where: (meeting) => and(
-        eq(meeting.id, id),
-        eq(meeting.ownerId, ownerId)
-      ),
+      where: (meeting) => and(eq(meeting.id, id), eq(meeting.ownerId, ownerId)),
       with: {
         participants: true,
       },
@@ -100,12 +96,7 @@ export class MeetingRepository {
   async delete(id: string, ownerId: string) {
     const [meeting] = await db
       .delete(meetings)
-      .where(
-        and(
-          eq(meetings.id, id),
-          eq(meetings.ownerId, ownerId),
-        ),
-      )
+      .where(and(eq(meetings.id, id), eq(meetings.ownerId, ownerId)))
       .returning();
 
     return meeting;

@@ -9,7 +9,7 @@ export const users = pgTable("users", {
 
   passwordHash: text(),
 
-  googleId: text(),
+  googleId: text().unique(),
 
   createdAt: timestamp().defaultNow().notNull(),
 

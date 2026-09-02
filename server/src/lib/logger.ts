@@ -1,11 +1,15 @@
 import pino from "pino";
 
+const isTest = process.env.NODE_ENV === "test";
+
 export const logger = pino(
-  process.env.NODE_ENV !== "production"
-    ? {
-        transport: {
-          target: "pino-pretty",
-        },
-      }
-    : {},
+  isTest
+    ? { enabled: false }
+    : process.env.NODE_ENV !== "production"
+      ? {
+          transport: {
+            target: "pino-pretty",
+          },
+        }
+      : {},
 );

@@ -1,9 +1,7 @@
 import { MeetingRepository } from "../repositories/meeting.repository.js";
-import {
-  CreateMeetingDto,
-  UpdateMeetingDto,
-} from "../schemas/meeting.schema.js";
+import { CreateMeetingDto, UpdateMeetingDto } from "../schemas/meeting.schema.js";
 import { AppError } from "../errors/app-error.js";
+import { serializeCreatedMeeting, serializeMeetingWithParticipants } from "../lib/serializers.js";
 
 export class MeetingService {
   constructor(private readonly repository: MeetingRepository) {}
@@ -34,11 +32,13 @@ export class MeetingService {
       })),
     });
 
-    return result;
+    return serializeCreatedMeeting(result);
   }
 
   async findAll(userId: string) {
-    return this.repository.findByOwnerId(userId);
+    const meetings = await this.repository.findByOwnerId(userId);
+
+    return meetings.map(serializeMeetingWithParticipants);
   }
 
   async findById(meetingId: string, userId: string) {
@@ -48,14 +48,12 @@ export class MeetingService {
       throw new AppError(404, "Meeting not found");
     }
 
-    return meeting;
+    return serializeMeetingWithParticipants(meeting);
   }
 
   async update(meetingId: string, userId: string, data: UpdateMeetingDto) {
     if (data.participantList !== undefined) {
-      const ownerParticipants = data.participantList.filter(
-        (participant) => participant.isOwner,
-      );
+      const ownerParticipants = data.participantList.filter((participant) => participant.isOwner);
 
       if (ownerParticipants.length !== 1) {
         throw new AppError(400, "Exactly one participant must be the owner");
@@ -81,7 +79,7 @@ export class MeetingService {
       throw new AppError(404, "Meeting not found");
     }
 
-    return meeting;
+    return serializeMeetingWithParticipants(meeting);
   }
 
   async delete(meetingId: string, userId: string) {
@@ -93,6 +91,4 @@ export class MeetingService {
 
     return meeting;
   }
-
-
 }

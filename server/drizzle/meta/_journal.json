@@ -29,6 +29,13 @@
       "when": 1786674349007,
       "tag": "0003_typical_spot",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788301537662,
+      "tag": "0004_sloppy_morlun",
+      "breakpoints": true
     }
   ]
 }

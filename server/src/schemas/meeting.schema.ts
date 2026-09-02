@@ -15,10 +15,7 @@ export const updateMeetingSchema = z
     totalAmount: z.coerce.number().min(0).optional(),
     participantList: z.array(participantSchema).min(1).optional(),
   })
-  .refine(
-    (data) => Object.keys(data).length > 0,
-    "At least one field is required",
-  );
+  .refine((data) => Object.keys(data).length > 0, "At least one field is required");
 
 export const meetingParamsSchema = z.object({
   id: z.uuid(),

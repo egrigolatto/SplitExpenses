@@ -83,7 +83,7 @@ export class GoogleAuthService {
       throw new AppError(401, "Google authentication failed");
     }
 
-    const email = payload.email;
+    const email = payload.email.trim().toLowerCase();
     const googleId = payload.sub;
     const name = payload.name?.trim().slice(0, 100) || email.split("@")[0] || "User";
 
