@@ -1,5 +1,9 @@
 import { MeetingRepository } from "../repositories/meeting.repository.js";
-import { CreateMeetingDto, UpdateMeetingDto } from "../schemas/meeting.schema.js";
+import {
+  CreateMeetingDto,
+  ListMeetingsQueryDto,
+  UpdateMeetingDto,
+} from "../schemas/meeting.schema.js";
 import { AppError } from "../errors/app-error.js";
 import { serializeCreatedMeeting, serializeMeetingWithParticipants } from "../lib/serializers.js";
 
@@ -48,10 +52,22 @@ export class MeetingService {
     return serializeCreatedMeeting(result);
   }
 
-  async findAll(userId: string) {
-    const meetings = await this.repository.findByOwnerId(userId);
+  async findAll(userId: string, query: ListMeetingsQueryDto) {
+    const { page, limit } = query;
+    const offset = (page - 1) * limit;
 
-    return meetings.map(serializeMeetingWithParticipants);
+    const [meetings, total] = await Promise.all([
+      this.repository.findByOwnerId(userId, { limit, offset }),
+      this.repository.countByOwnerId(userId),
+    ]);
+
+    return {
+      items: meetings.map(serializeMeetingWithParticipants),
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findById(meetingId: string, userId: string) {

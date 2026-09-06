@@ -65,6 +65,27 @@ describe("Security / edge cases", () => {
     });
   });
 
+  describe("Docs", () => {
+    it("should serve the OpenAPI document", async () => {
+      const res = await request.get("/docs/openapi.json").expect(200);
+
+      expect(res.body).toMatchObject({
+        openapi: "3.0.3",
+        info: { title: "Split Expenses API" },
+      });
+      expect(res.body.paths).toHaveProperty("/auth/login");
+      expect(res.body.paths).toHaveProperty("/meetings");
+      expect(res.body.components.securitySchemes).toHaveProperty("cookieAuth");
+    });
+
+    it("should serve the Swagger UI", async () => {
+      const res = await request.get("/docs/").expect(200);
+
+      expect(res.headers["content-type"]).toContain("text/html");
+      expect(res.text).toContain("swagger-ui");
+    });
+  });
+
   describe("Rate limiting", () => {
     it("should return 429 after exceeding the auth limiter threshold", async () => {
       const miniApp = express();

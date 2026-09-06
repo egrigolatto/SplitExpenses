@@ -2,7 +2,7 @@ import { meetings } from "../db/schema/meetings.js";
 import { participants } from "../db/schema/participants.js";
 import { db } from "../db/index.js";
 import { AppError } from "../errors/app-error.js";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 
 type ParticipantInput = Omit<typeof participants.$inferInsert, "meetingId">;
 type MeetingInput = typeof meetings.$inferInsert;
@@ -40,13 +40,25 @@ export class MeetingRepository {
     });
   }
 
-  async findByOwnerId(ownerId: string) {
+  async findByOwnerId(ownerId: string, options: { limit: number; offset: number }) {
     return db.query.meetings.findMany({
       where: (meeting) => eq(meeting.ownerId, ownerId),
       with: {
         participants: true,
       },
+      orderBy: (meeting, { desc }) => [desc(meeting.createdAt)],
+      limit: options.limit,
+      offset: options.offset,
     });
+  }
+
+  async countByOwnerId(ownerId: string) {
+    const [result] = await db
+      .select({ count: count() })
+      .from(meetings)
+      .where(eq(meetings.ownerId, ownerId));
+
+    return Number(result?.count ?? 0);
   }
 
   async update(

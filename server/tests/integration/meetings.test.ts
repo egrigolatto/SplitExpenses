@@ -113,10 +113,47 @@ describe("Meeting endpoints", () => {
       const res = await agent.get("/api/v1/meetings").expect(200);
 
       expect(res.body).toHaveProperty("success", true);
-      const meetings = res.body.data;
-      expect(Array.isArray(meetings)).toBe(true);
-      expect(meetings).toHaveLength(1);
-      expect(meetings[0].name).toBe("Asado sábado");
+      expect(res.body.data).toMatchObject({ page: 1, limit: 10, total: 1, totalPages: 1 });
+      expect(res.body.data.items).toHaveLength(1);
+      expect(res.body.data.items[0].name).toBe("Asado sábado");
+    });
+
+    it("should paginate meetings with page and limit", async () => {
+      const { agent } = await registerAndLogin();
+
+      for (let index = 0; index < 3; index++) {
+        await agent
+          .post("/api/v1/meetings")
+          .send(createMeetingPayload({ name: `Reunión ${index}` }));
+      }
+
+      const res = await agent.get("/api/v1/meetings?page=2&limit=2").expect(200);
+
+      expect(res.body).toHaveProperty("success", true);
+      expect(res.body.data).toMatchObject({ page: 2, limit: 2, total: 3, totalPages: 2 });
+      expect(res.body.data.items).toHaveLength(1);
+    });
+
+    it("should return an empty page when there are no meetings", async () => {
+      const { agent } = await registerAndLogin();
+
+      const res = await agent.get("/api/v1/meetings?page=5").expect(200);
+
+      expect(res.body.data).toMatchObject({
+        items: [],
+        page: 5,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+      });
+    });
+
+    it("should reject invalid pagination params", async () => {
+      const { agent } = await registerAndLogin();
+
+      await agent.get("/api/v1/meetings?page=0").expect(400);
+      await agent.get("/api/v1/meetings?limit=0").expect(400);
+      await agent.get("/api/v1/meetings?limit=51").expect(400);
     });
   });
 

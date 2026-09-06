@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { MeetingService } from "../services/meeting.service.js";
-import { CreateMeetingDto } from "../schemas/meeting.schema.js";
+import { CreateMeetingDto, ListMeetingsQueryDto } from "../schemas/meeting.schema.js";
 import { AppError } from "../errors/app-error.js";
 
 export class MeetingController {
@@ -28,7 +28,8 @@ export class MeetingController {
         throw new AppError(401, "Unauthorized");
       }
 
-      const result = await this.service.findAll(userId);
+      const query = req.validatedQuery as ListMeetingsQueryDto;
+      const result = await this.service.findAll(userId, query);
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);

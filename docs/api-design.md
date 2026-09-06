@@ -264,10 +264,30 @@ Todas las rutas requieren autenticación.
 ## Obtener reuniones
 
 ```
-GET /meetings
+GET /meetings?page=1&limit=10
 ```
 
-Devuelve todas las reuniones pertenecientes al usuario.
+Devuelve las reuniones pertenecientes al usuario, paginadas y ordenadas por fecha de creación (más recientes primero).
+
+Query params
+
+- `page` (opcional, default `1`, mínimo `1`).
+- `limit` (opcional, default `10`, mínimo `1`, máximo `50`).
+
+Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [],
+    "page": 1,
+    "limit": 10,
+    "total": 0,
+    "totalPages": 0
+  }
+}
+```
 
 ---
 

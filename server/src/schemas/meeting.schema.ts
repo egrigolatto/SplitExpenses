@@ -21,5 +21,11 @@ export const meetingParamsSchema = z.object({
   id: z.uuid(),
 });
 
+export const listMeetingsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+});
+
 export type CreateMeetingDto = z.infer<typeof createMeetingSchema>;
 export type UpdateMeetingDto = z.infer<typeof updateMeetingSchema>;
+export type ListMeetingsQueryDto = z.infer<typeof listMeetingsQuerySchema>;

@@ -5,6 +5,7 @@ import { MeetingRepository } from "../repositories/meeting.repository.js";
 import { validate } from "../middlewares/validate.js";
 import {
   createMeetingSchema,
+  listMeetingsQuerySchema,
   meetingParamsSchema,
   updateMeetingSchema,
 } from "../schemas/meeting.schema.js";
@@ -25,7 +26,14 @@ router.post(
   controller.create.bind(controller),
 );
 
-router.get("/", authenticate, controller.findAll.bind(controller));
+router.get(
+  "/",
+  authenticate,
+  validate({
+    query: listMeetingsQuerySchema,
+  }),
+  controller.findAll.bind(controller),
+);
 
 router.get(
   "/:id",

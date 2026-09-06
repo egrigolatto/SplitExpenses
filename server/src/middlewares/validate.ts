@@ -18,7 +18,7 @@ export function validate(schemas: ValidationSchemas): RequestHandler {
     }
 
     if (schemas.query) {
-      req.query = schemas.query.parse(req.query) as typeof req.query;
+      req.validatedQuery = schemas.query.parse(req.query);
     }
 
     next();
