@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { AppError } from "../errors/app-error.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import { getOAuth2Client } from "../lib/google-oauth.js";
-import { generateAccessToken } from "../lib/jwt.js";
+import { issueSession } from "../lib/session.js";
 import { toPublicUser } from "../lib/user-serializer.js";
 import { env } from "../config/env.js";
 
@@ -85,9 +85,9 @@ export class GoogleAuthService {
 
     const user = await this.findOrCreateUser({ email, googleId, name });
 
-    const accessToken = generateAccessToken({ sub: user.id });
+    const session = await issueSession(user.id);
 
-    return { user: toPublicUser(user), accessToken };
+    return { user: toPublicUser(user), ...session };
   }
 
   private verifyState(state: string): GoogleStatePayload {

@@ -33,6 +33,12 @@ router.post(
   authController.login.bind(authController),
 );
 
+router.post(
+  "/refresh",
+  ...(env.nodeEnv === "test" ? [] : [authLimiter]),
+  authController.refresh.bind(authController),
+);
+
 router.post("/logout", authController.logout.bind(authController));
 
 router.get("/me", authenticate, authController.getCurrentUser.bind(authController));

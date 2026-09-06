@@ -2,22 +2,38 @@ import type { Response } from "express";
 
 import { env } from "../config/env.js";
 
-const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+export const refreshCookieName = `${env.cookieName}_refresh`;
 
-export function setAuthCookie(res: Response, token: string) {
-  res.cookie(env.cookieName, token, {
+const COOKIE_SECURE = env.nodeEnv === "production";
+
+export function setAuthCookies(
+  res: Response,
+  {
+    accessToken,
+    refreshToken,
+  }: {
+    accessToken: string;
+    refreshToken?: string | undefined;
+  },
+) {
+  res.cookie(env.cookieName, accessToken, {
     httpOnly: true,
-    secure: env.nodeEnv === "production",
+    secure: COOKIE_SECURE,
     sameSite: "lax",
-    maxAge: COOKIE_MAX_AGE,
+    path: "/",
   });
+
+  if (refreshToken) {
+    res.cookie(refreshCookieName, refreshToken, {
+      httpOnly: true,
+      secure: COOKIE_SECURE,
+      sameSite: "lax",
+      path: "/api/v1/auth",
+    });
+  }
 }
 
-export function clearAuthCookie(res: Response) {
-  res.cookie(env.cookieName, "", {
-    httpOnly: true,
-    secure: env.nodeEnv === "production",
-    sameSite: "lax",
-    maxAge: 0,
-  });
+export function clearAuthCookies(res: Response) {
+  res.clearCookie(env.cookieName);
+  res.clearCookie(refreshCookieName);
 }

@@ -11,6 +11,14 @@ export const envSchema = z.object({
 
   JWT_EXPIRES_IN: z.coerce.number(),
 
+  ACCESS_TOKEN_SECRET: z.string().min(32),
+
+  REFRESH_TOKEN_SECRET: z.string().min(32),
+
+  ACCESS_TOKEN_EXPIRES_IN: z.string(),
+
+  REFRESH_TOKEN_EXPIRES_IN: z.string(),
+
   COOKIE_NAME: z.string(),
 
   GOOGLE_CLIENT_ID: z.string(),

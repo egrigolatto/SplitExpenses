@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../auth/auth.service.js";
 import { UserService } from "../services/users.service.js";
-import { setAuthCookie, clearAuthCookie } from "../lib/cookies.js";
+import { setAuthCookies, clearAuthCookies, refreshCookieName } from "../lib/cookies.js";
 
 export class AuthController {
   constructor(
@@ -11,7 +11,9 @@ export class AuthController {
 
   async register(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await this.authService.registerUser(req.body);
+      const { user, accessToken, refreshToken } = await this.authService.registerUser(req.body);
+
+      setAuthCookies(res, { accessToken, refreshToken });
 
       res.status(201).json({
         success: true,
@@ -24,14 +26,15 @@ export class AuthController {
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const { user, accessToken } = await this.authService.loginUser(req.body);
+      const { user, accessToken, refreshToken } = await this.authService.loginUser(req.body);
 
-      setAuthCookie(res, accessToken);
+      setAuthCookies(res, { accessToken, refreshToken });
 
       res.status(200).json({
         success: true,
         data: {
           user,
+          accessToken,
         },
       });
     } catch (error) {
@@ -39,9 +42,45 @@ export class AuthController {
     }
   }
 
-  async logout(_req: Request, res: Response, next: NextFunction) {
+  async refresh(req: Request, res: Response, next: NextFunction) {
     try {
-      clearAuthCookie(res);
+      const rawRefreshToken = req.cookies[refreshCookieName] as string | undefined;
+
+      if (!rawRefreshToken) {
+        res.clearCookie(refreshCookieName);
+        res.status(401).json({
+          success: false,
+          message: "Refresh token not provided",
+        });
+        return;
+      }
+
+      const { user, accessToken, refreshToken } =
+        await this.authService.refreshSession(rawRefreshToken);
+
+      setAuthCookies(res, { accessToken, refreshToken });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          user,
+          accessToken,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      const rawRefreshToken = req.cookies[refreshCookieName] as string | undefined;
+
+      if (rawRefreshToken) {
+        await this.authService.logout(rawRefreshToken);
+      }
+
+      clearAuthCookies(res);
 
       res.status(200).json({
         success: true,

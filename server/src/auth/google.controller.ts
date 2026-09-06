@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 import { GoogleAuthService } from "./google.service.js";
 import { AppError } from "../errors/app-error.js";
-import { setAuthCookie } from "../lib/cookies.js";
+import { setAuthCookies } from "../lib/cookies.js";
 import { env } from "../config/env.js";
 
 export class GoogleAuthController {
@@ -28,9 +28,12 @@ export class GoogleAuthController {
     }
 
     try {
-      const { accessToken } = await this.googleAuthService.handleCallback(code, state);
+      const { accessToken, refreshToken } = await this.googleAuthService.handleCallback(
+        code,
+        state,
+      );
 
-      setAuthCookie(res, accessToken);
+      setAuthCookies(res, { accessToken, refreshToken });
 
       res.redirect(env.frontendUrl);
     } catch (error) {

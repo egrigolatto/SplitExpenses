@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import { meetings } from "./meetings.js";
 import { participants } from "./participants.js";
+import { refreshTokens } from "./refresh-tokens.js";
 import { users } from "./users.js";
 
 export const meetingsRelations = relations(meetings, ({ one, many }) => ({
@@ -25,4 +26,12 @@ export const participantsRelations = relations(participants, ({ one }) => ({
 export const usersRelations = relations(users, ({ many }) => ({
   meetings: many(meetings),
   participants: many(participants),
+  refreshTokens: many(refreshTokens),
+}));
+
+export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [refreshTokens.userId],
+    references: [users.id],
+  }),
 }));
