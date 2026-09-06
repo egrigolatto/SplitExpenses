@@ -57,6 +57,13 @@
       "when": 1788622272243,
       "tag": "0007_nappy_titania",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788734583560,
+      "tag": "0008_sticky_shen",
+      "breakpoints": true
     }
   ]
 }
