@@ -204,13 +204,44 @@ Redirecciona al flujo OAuth.
 
 ---
 
+## Renovar sesión (refresh)
+
+```
+POST /auth/refresh
+```
+
+Lee el refresh token desde la cookie `refresh_token` (HttpOnly). Emite un nuevo access token y **rota** el refresh token (revoca el anterior y crea uno nuevo en la misma familia).
+
+**Reuse detection:** cada refresh pertenece a una "familia". Si un refresh token ya consumido (rotado) se presenta de nuevo:
+
+- **Dentro de la ventana de gracia (10s):** se re-emite el access token sin revocar la familia (protege refrescos paralelos del mismo usuario, p.ej. múltiples pestañas).
+- **Fuera de la ventana de gracia:** se **revoca toda la familia** (todas las sesiones del usuario quedan invalidadas) y se responde `401` — señal de que un atacante está reutilizando un token robado.
+
+Un token revocado por **logout** siempre falla inmediatamente (no aplica ventana de gracia).
+
+Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": { "id": "...", "name": "Juan Pérez" },
+    "accessToken": "..."
+  }
+}
+```
+
+La cookie de refresh se actualiza con el nuevo token rotado en cada respuesta de refresh.
+
+---
+
 ## Logout
 
 ```
 POST /auth/logout
 ```
 
-Elimina la cookie de autenticación.
+Revoca el refresh token en la base de datos y elimina ambas cookies de autenticación.
 
 ---
 
