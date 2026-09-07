@@ -15,9 +15,5 @@ export const updateUserSchema = z
   })
   .refine((data) => Object.keys(data).length > 0, "At least one field is required");
 
-export const userParamsSchema = z.object({
-  id: z.uuid(),
-});
-
 export type CreateUserDto = z.infer<typeof createUserSchema>;
 export type UpdateUserDto = z.infer<typeof updateUserSchema>;

@@ -256,20 +256,6 @@ registry.registerPath({
 });
 
 registry.registerPath({
-  method: "get",
-  path: "/users/{id}",
-  tags: ["Users"],
-  security: authed,
-  summary: "Get a user by id",
-  request: { params: z.object({ id: z.uuid() }) },
-  responses: {
-    200: successResponse(userSchema),
-    401: errorResponses[401],
-    404: errorResponses[404],
-  },
-});
-
-registry.registerPath({
   method: "post",
   path: "/meetings",
   tags: ["Meetings"],

@@ -4,7 +4,7 @@ import { UserService } from "../services/users.service.js";
 import { UserRepository } from "../repositories/user.repository.js";
 import { validate } from "../middlewares/validate.js";
 import { authenticate } from "../middlewares/authenticate.js";
-import { updateUserSchema, userParamsSchema } from "../schemas/user.schema.js";
+import { updateUserSchema } from "../schemas/user.schema.js";
 
 const router = Router();
 
@@ -19,15 +19,6 @@ router.patch(
     body: updateUserSchema,
   }),
   controller.updateMe.bind(controller),
-);
-
-router.get(
-  "/:id",
-  authenticate,
-  validate({
-    params: userParamsSchema,
-  }),
-  controller.getById.bind(controller),
 );
 
 export default router;

@@ -93,10 +93,9 @@ Todas las respuestas exitosas siguen el contrato `{ success: true, data }`. Los 
 
 ### Users
 
-| Método | Ruta         | Descripción                     |
-| ------ | ------------ | ------------------------------- |
-| PATCH  | `/users/me`  | Actualiza el perfil del usuario |
-| GET    | `/users/:id` | Obtiene un usuario por id       |
+| Método | Ruta        | Descripción                     |
+| ------ | ----------- | ------------------------------- |
+| PATCH  | `/users/me` | Actualiza el perfil del usuario |
 
 ### Meetings
 

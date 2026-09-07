@@ -2,7 +2,7 @@ import express from "express";
 import supertest from "supertest";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { cleanDatabase, registerAndLogin, request } from "../helpers.js";
+import { cleanDatabase, request } from "../helpers.js";
 import { authLimiter } from "../../src/middlewares/rate-limit.js";
 
 describe("Security / edge cases", () => {
@@ -43,25 +43,6 @@ describe("Security / edge cases", () => {
         success: false,
         message: "Invalid JSON body",
       });
-    });
-  });
-
-  describe("GET /api/v1/users/:id", () => {
-    it("should require authentication", async () => {
-      const { id } = await registerAndLogin();
-
-      const res = await request.get(`/api/v1/users/${id}`).expect(401);
-
-      expect(res.body).toMatchObject({ success: false });
-    });
-
-    it("should allow an authenticated user to fetch their own profile", async () => {
-      const { agent, user, id } = await registerAndLogin();
-
-      const res = await agent.get(`/api/v1/users/${id}`).expect(200);
-
-      expect(res.body).toHaveProperty("success", true);
-      expect(res.body.data.email).toBe(user.email);
     });
   });
 
