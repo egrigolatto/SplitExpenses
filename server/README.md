@@ -44,36 +44,36 @@ La API queda disponible en `http://localhost:3000/api/v1` y la documentación Sw
 
 ## Variables de entorno
 
-| Variable                   | Descripción                                             | Ejemplo                          |
-| -------------------------- | ------------------------------------------------------- | -------------------------------- |
-| `NODE_ENV`                 | Entorno (`development`, `test`, `production`)           | `development`                    |
-| `PORT`                     | Puerto del servidor                                     | `3000`                           |
-| `DATABASE_URL`             | Connection string de PostgreSQL                         | `postgres://postgres:postgres@localhost:5432/split_expenses` |
-| `JWT_SECRET`               | Secreto para el token de estado del flujo Google OAuth  | string de 32+ caracteres         |
-| `ACCESS_TOKEN_SECRET`      | Secreto del JWT de acceso                               | string de 32+ caracteres         |
-| `REFRESH_TOKEN_SECRET`     | Secreto del JWT de refresh                              | string de 32+ caracteres         |
-| `ACCESS_TOKEN_EXPIRES_IN`  | Expiración del access token                             | `15m`                            |
-| `REFRESH_TOKEN_EXPIRES_IN` | Expiración del refresh token                            | `30d`                            |
-| `COOKIE_NAME`              | Nombre de la cookie de acceso                           | `access_token`                   |
-| `GOOGLE_CLIENT_ID`         | Client ID de Google OAuth                               |                                  |
-| `GOOGLE_CLIENT_SECRET`     | Client secret de Google OAuth                           |                                  |
-| `GOOGLE_REDIRECT_URI`      | URI de callback de Google OAuth                         | `http://localhost:3000/api/v1/auth/google/callback` |
-| `FRONTEND_URL`             | URL del frontend (CORS)                                 | `http://localhost:5173`          |
+| Variable                   | Descripción                                            | Ejemplo                                                      |
+| -------------------------- | ------------------------------------------------------ | ------------------------------------------------------------ |
+| `NODE_ENV`                 | Entorno (`development`, `test`, `production`)          | `development`                                                |
+| `PORT`                     | Puerto del servidor                                    | `3000`                                                       |
+| `DATABASE_URL`             | Connection string de PostgreSQL                        | `postgres://postgres:postgres@localhost:5432/split_expenses` |
+| `JWT_SECRET`               | Secreto para el token de estado del flujo Google OAuth | string de 32+ caracteres                                     |
+| `ACCESS_TOKEN_SECRET`      | Secreto del JWT de acceso                              | string de 32+ caracteres                                     |
+| `REFRESH_TOKEN_SECRET`     | Secreto del JWT de refresh                             | string de 32+ caracteres                                     |
+| `ACCESS_TOKEN_EXPIRES_IN`  | Expiración del access token                            | `15m`                                                        |
+| `REFRESH_TOKEN_EXPIRES_IN` | Expiración del refresh token                           | `30d`                                                        |
+| `COOKIE_NAME`              | Nombre de la cookie de acceso                          | `access_token`                                               |
+| `GOOGLE_CLIENT_ID`         | Client ID de Google OAuth                              |                                                              |
+| `GOOGLE_CLIENT_SECRET`     | Client secret de Google OAuth                          |                                                              |
+| `GOOGLE_REDIRECT_URI`      | URI de callback de Google OAuth                        | `http://localhost:3000/api/v1/auth/google/callback`          |
+| `FRONTEND_URL`             | URL del frontend (CORS)                                | `http://localhost:5173`                                      |
 
 ## Scripts
 
-| Script              | Descripción                                    |
-| ------------------- | ---------------------------------------------- |
-| `pnpm dev`          | Servidor en modo watch (tsx)                   |
-| `pnpm build`        | Compila TypeScript a `dist/`                   |
-| `pnpm start`        | Corre el servidor compilado                    |
-| `pnpm test`         | Corre la suite de tests (usa `.env.test`)      |
-| `pnpm test:watch`   | Tests en modo watch                            |
-| `pnpm lint`         | ESLint                                         |
-| `pnpm format`       | Prettier --write                               |
-| `pnpm db:generate`  | Genera migraciones desde los schemas de Drizzle|
-| `pnpm db:migrate`   | Aplica las migraciones                         |
-| `pnpm db:studio`    | Drizzle Studio (explorar la DB)                |
+| Script             | Descripción                                     |
+| ------------------ | ----------------------------------------------- |
+| `pnpm dev`         | Servidor en modo watch (tsx)                    |
+| `pnpm build`       | Compila TypeScript a `dist/`                    |
+| `pnpm start`       | Corre el servidor compilado                     |
+| `pnpm test`        | Corre la suite de tests (usa `.env.test`)       |
+| `pnpm test:watch`  | Tests en modo watch                             |
+| `pnpm lint`        | ESLint                                          |
+| `pnpm format`      | Prettier --write                                |
+| `pnpm db:generate` | Genera migraciones desde los schemas de Drizzle |
+| `pnpm db:migrate`  | Aplica las migraciones                          |
+| `pnpm db:studio`   | Drizzle Studio (explorar la DB)                 |
 
 ## Endpoints
 
@@ -81,32 +81,32 @@ Todas las respuestas exitosas siguen el contrato `{ success: true, data }`. Los 
 
 ### Auth
 
-| Método | Ruta                     | Descripción                                                              |
-| ------ | ------------------------ | ------------------------------------------------------------------------ |
-| POST   | `/auth/register`         | Registro con email y password                                            |
-| POST   | `/auth/login`            | Login con email y password                                               |
-| POST   | `/auth/refresh`          | Renueva el access token usando la cookie de refresh                      |
-| POST   | `/auth/logout`           | Revoca el refresh token y limpia las cookies                             |
-| GET    | `/auth/me`               | Usuario autenticado                                                      |
-| GET    | `/auth/google`           | Redirige al flujo OAuth de Google                                        |
-| GET    | `/auth/google/callback`  | Callback de Google OAuth                                                 |
+| Método | Ruta                    | Descripción                                         |
+| ------ | ----------------------- | --------------------------------------------------- |
+| POST   | `/auth/register`        | Registro con email y password                       |
+| POST   | `/auth/login`           | Login con email y password                          |
+| POST   | `/auth/refresh`         | Renueva el access token usando la cookie de refresh |
+| POST   | `/auth/logout`          | Revoca el refresh token y limpia las cookies        |
+| GET    | `/auth/me`              | Usuario autenticado                                 |
+| GET    | `/auth/google`          | Redirige al flujo OAuth de Google                   |
+| GET    | `/auth/google/callback` | Callback de Google OAuth                            |
 
 ### Users
 
-| Método | Ruta         | Descripción                        |
-| ------ | ------------ | ---------------------------------- |
-| PATCH  | `/users/me`  | Actualiza el perfil del usuario    |
-| GET    | `/users/:id` | Obtiene un usuario por id          |
+| Método | Ruta         | Descripción                     |
+| ------ | ------------ | ------------------------------- |
+| PATCH  | `/users/me`  | Actualiza el perfil del usuario |
+| GET    | `/users/:id` | Obtiene un usuario por id       |
 
 ### Meetings
 
-| Método | Ruta            | Descripción                                      |
-| ------ | --------------- | ------------------------------------------------ |
-| POST   | `/meetings`     | Crea una reunión                                 |
-| GET    | `/meetings`     | Lista reuniones del usuario (paginado)           |
-| GET    | `/meetings/:id` | Obtiene una reunión por id                       |
-| PATCH  | `/meetings/:id` | Actualiza una reunión                            |
-| DELETE | `/meetings/:id` | Elimina una reunión                              |
+| Método | Ruta            | Descripción                            |
+| ------ | --------------- | -------------------------------------- |
+| POST   | `/meetings`     | Crea una reunión                       |
+| GET    | `/meetings`     | Lista reuniones del usuario (paginado) |
+| GET    | `/meetings/:id` | Obtiene una reunión por id             |
+| PATCH  | `/meetings/:id` | Actualiza una reunión                  |
+| DELETE | `/meetings/:id` | Elimina una reunión                    |
 
 `GET /meetings` acepta `page` (default 1) y `limit` (default 10, máximo 50) y devuelve:
 
@@ -116,6 +116,13 @@ Todas las respuestas exitosas siguen el contrato `{ success: true, data }`. Los 
   "data": { "items": [], "page": 1, "limit": 10, "total": 0, "totalPages": 0 }
 }
 ```
+
+## Health
+
+| Método | Ruta            | Descripción                                                     |
+| ------ | --------------- | --------------------------------------------------------------- |
+| GET    | `/health`       | Liveness: proceso vivo (no toca dependencias)                   |
+| GET    | `/health/ready` | Readiness: `SELECT 1` con timeout 2s → 503 si la DB no responde |
 
 ## Autenticación
 

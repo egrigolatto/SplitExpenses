@@ -104,7 +104,7 @@ Contiene:
 
 ## Públicos
 
-### Health Check
+### Health Check (liveness)
 
 ```
 GET /health
@@ -112,7 +112,7 @@ GET /health
 
 Descripción
 
-Verifica que el servidor esté funcionando correctamente.
+Verifica que el proceso del servidor esté funcionando. No consulta dependencias (ni base de datos), por lo que es apto como liveness probe.
 
 Respuesta
 
@@ -123,6 +123,40 @@ Respuesta
     "status": "ok",
     "timestamp": "2026-09-01T12:00:00.000Z"
   }
+}
+```
+
+---
+
+### Ready Check (readiness)
+
+```
+GET /health/ready
+```
+
+Descripción
+
+Verifica que el servicio pueda atender tráfico: ejecuta `SELECT 1` contra PostgreSQL con un timeout de 2 segundos. Útil como readiness probe en orquestadores/healthchecks de despliegue.
+
+Respuesta
+
+```json
+{
+  "success": true,
+  "data": {
+    "status": "ok",
+    "database": true,
+    "timestamp": "2026-09-01T12:00:00.000Z"
+  }
+}
+```
+
+Si la base de datos es inalcanzable, responde `503`:
+
+```json
+{
+  "success": false,
+  "message": "Database unavailable"
 }
 ```
 
@@ -397,16 +431,16 @@ Elimina una reunión.
 
 # Códigos HTTP
 
-| Código | Significado |
-|---------|-------------|
-| 200 | OK |
-| 201 | Created |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 409 | Conflict |
-| 500 | Internal Server Error |
+| Código | Significado           |
+| ------ | --------------------- |
+| 200    | OK                    |
+| 201    | Created               |
+| 400    | Bad Request           |
+| 401    | Unauthorized          |
+| 403    | Forbidden             |
+| 404    | Not Found             |
+| 409    | Conflict              |
+| 500    | Internal Server Error |
 
 ---
 
