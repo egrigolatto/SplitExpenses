@@ -1,4 +1,4 @@
-import { and, eq, isNull, lte } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, lte } from "drizzle-orm";
 
 import { db } from "../db/index.js";
 import { refreshTokens } from "../db/schema/refresh-tokens.js";
@@ -64,6 +64,20 @@ export class RefreshTokenRepository {
   }
 
   async deleteExpired(now: Date) {
-    await db.delete(refreshTokens).where(lte(refreshTokens.expiresAt, now));
+    const deleted = await db
+      .delete(refreshTokens)
+      .where(lte(refreshTokens.expiresAt, now))
+      .returning({ id: refreshTokens.id });
+
+    return deleted.length;
+  }
+
+  async deleteRevokedBefore(cutoff: Date) {
+    const deleted = await db
+      .delete(refreshTokens)
+      .where(and(isNotNull(refreshTokens.revokedAt), lte(refreshTokens.revokedAt, cutoff)))
+      .returning({ id: refreshTokens.id });
+
+    return deleted.length;
   }
 }

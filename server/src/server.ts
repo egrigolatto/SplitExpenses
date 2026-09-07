@@ -2,6 +2,7 @@ import app from "./app.js";
 import { env } from "./config/env.js";
 import { logger } from "./lib/logger.js";
 import { closePool } from "./db/index.js";
+import { startRefreshTokenCleanup } from "./jobs/refresh-token-cleanup.js";
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 
@@ -12,6 +13,8 @@ const server = app.listen(env.port, () => {
     },
     `Server started in http://localhost:${env.port}`,
   );
+
+  startRefreshTokenCleanup();
 });
 
 let shuttingDown = false;

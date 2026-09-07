@@ -10,6 +10,7 @@ import { CreateUserDto } from "../schemas/user.schema.js";
 import { LoginDto } from "../schemas/auth.schema.js";
 
 const REUSE_GRACE_PERIOD_MS = 10_000;
+const REVOKE_AUDIT_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 
 export class AuthService {
   private readonly refreshRepository: RefreshTokenRepository;
@@ -139,6 +140,14 @@ export class AuthService {
   }
 
   async cleanupExpiredTokens() {
-    await this.refreshRepository.deleteExpired(new Date());
+    const now = new Date();
+    const revokedBefore = new Date(now.getTime() - REVOKE_AUDIT_RETENTION_MS);
+
+    const [expiredDeleted, revokedDeleted] = await Promise.all([
+      this.refreshRepository.deleteExpired(now),
+      this.refreshRepository.deleteRevokedBefore(revokedBefore),
+    ]);
+
+    return { expiredDeleted, revokedDeleted };
   }
 }

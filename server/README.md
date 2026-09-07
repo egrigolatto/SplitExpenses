@@ -124,6 +124,7 @@ Todas las respuestas exitosas siguen el contrato `{ success: true, data }`. Los 
 - Cada `POST /auth/refresh` **rota** el refresh token (revoca el anterior y emite uno nuevo en la misma familia).
 - **Detección de reuso:** si se presenta un refresh token ya rotado dentro de una ventana de gracia de 10s, se re-emite el access token sin revocar la familia (protege refrescos paralelos). Fuera de la ventana, se revoca toda la familia (posible robo de token).
 - `POST /auth/logout` revoca el refresh token con efecto inmediato.
+- Los refresh tokens vencidos y las revocaciones de más de 30 días se purgan automáticamente al arrancar el server y cada 6 horas (job en `src/jobs/refresh-token-cleanup.ts`).
 
 ## Tests
 
