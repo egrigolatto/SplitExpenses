@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const trustProxySchema = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  z.coerce.number().int().min(0).max(5).optional(),
+);
+
 export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
 
@@ -28,4 +33,6 @@ export const envSchema = z.object({
   GOOGLE_REDIRECT_URI: z.url(),
 
   FRONTEND_URL: z.url(),
+
+  TRUST_PROXY: trustProxySchema,
 });

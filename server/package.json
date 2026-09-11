@@ -27,6 +27,9 @@
       "onFail": "download"
     }
   },
+  "engines": {
+    "node": ">=24"
+  },
   "type": "module",
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^9.1.0",

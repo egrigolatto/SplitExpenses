@@ -20,4 +20,5 @@ export const env = {
   googleClientSecret: parsedEnv.GOOGLE_CLIENT_SECRET,
   googleRedirectUri: parsedEnv.GOOGLE_REDIRECT_URI,
   frontendUrl: parsedEnv.FRONTEND_URL,
+  trustProxy: parsedEnv.TRUST_PROXY,
 };

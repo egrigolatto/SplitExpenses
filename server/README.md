@@ -44,21 +44,22 @@ La API queda disponible en `http://localhost:3000/api/v1` y la documentación Sw
 
 ## Variables de entorno
 
-| Variable                   | Descripción                                            | Ejemplo                                                      |
-| -------------------------- | ------------------------------------------------------ | ------------------------------------------------------------ |
-| `NODE_ENV`                 | Entorno (`development`, `test`, `production`)          | `development`                                                |
-| `PORT`                     | Puerto del servidor                                    | `3000`                                                       |
-| `DATABASE_URL`             | Connection string de PostgreSQL                        | `postgres://postgres:postgres@localhost:5432/split_expenses` |
-| `JWT_SECRET`               | Secreto para el token de estado del flujo Google OAuth | string de 32+ caracteres                                     |
-| `ACCESS_TOKEN_SECRET`      | Secreto del JWT de acceso                              | string de 32+ caracteres                                     |
-| `REFRESH_TOKEN_SECRET`     | Secreto del JWT de refresh                             | string de 32+ caracteres                                     |
-| `ACCESS_TOKEN_EXPIRES_IN`  | Expiración del access token                            | `15m`                                                        |
-| `REFRESH_TOKEN_EXPIRES_IN` | Expiración del refresh token                           | `30d`                                                        |
-| `COOKIE_NAME`              | Nombre de la cookie de acceso                          | `access_token`                                               |
-| `GOOGLE_CLIENT_ID`         | Client ID de Google OAuth                              |                                                              |
-| `GOOGLE_CLIENT_SECRET`     | Client secret de Google OAuth                          |                                                              |
-| `GOOGLE_REDIRECT_URI`      | URI de callback de Google OAuth                        | `http://localhost:3000/api/v1/auth/google/callback`          |
-| `FRONTEND_URL`             | URL del frontend (CORS)                                | `http://localhost:5173`                                      |
+| Variable                   | Descripción                                                                   | Ejemplo                                                      |
+| -------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `NODE_ENV`                 | Entorno (`development`, `test`, `production`)                                 | `development`                                                |
+| `PORT`                     | Puerto del servidor                                                           | `3000`                                                       |
+| `DATABASE_URL`             | Connection string de PostgreSQL                                               | `postgres://postgres:postgres@localhost:5432/split_expenses` |
+| `JWT_SECRET`               | Secreto para el token de estado del flujo Google OAuth                        | string de 32+ caracteres                                     |
+| `ACCESS_TOKEN_SECRET`      | Secreto del JWT de acceso                                                     | string de 32+ caracteres                                     |
+| `REFRESH_TOKEN_SECRET`     | Secreto del JWT de refresh                                                    | string de 32+ caracteres                                     |
+| `ACCESS_TOKEN_EXPIRES_IN`  | Expiración del access token                                                   | `15m`                                                        |
+| `REFRESH_TOKEN_EXPIRES_IN` | Expiración del refresh token                                                  | `30d`                                                        |
+| `COOKIE_NAME`              | Nombre de la cookie de acceso                                                 | `access_token`                                               |
+| `GOOGLE_CLIENT_ID`         | Client ID de Google OAuth                                                     |                                                              |
+| `GOOGLE_CLIENT_SECRET`     | Client secret de Google OAuth                                                 |                                                              |
+| `GOOGLE_REDIRECT_URI`      | URI de callback de Google OAuth                                               | `http://localhost:3000/api/v1/auth/google/callback`          |
+| `FRONTEND_URL`             | URL del frontend (CORS)                                                       | `http://localhost:5173`                                      |
+| `TRUST_PROXY`              | Capas de reverse proxy por delante (típicamente 1 en la nube). Vacío en local | `1`                                                          |
 
 ## Scripts
 
@@ -139,6 +140,31 @@ La suite corre contra una base `split_expenses_test` (connection string en `.env
 ```bash
 pnpm test
 ```
+
+## Deploy
+
+Este backend está escrito como server clásico de proceso largo (pool de conexiones, job periódico in-process, graceful shutdown con `SIGTERM`). Para elegir dónde desplegar, busca un hosting que soporte **procesos Node persistentes** (web service / container); los runtimes serverless de funciones efímeras no aplican porque el cron in-process, el graceful shutdown y el rate limiting en memoria dependen de un proceso vivo.
+
+**Base de datos:** cualquier PostgreSQL gestionado que exponga connection string con soporte de pooling (directo o vía pooler).
+
+**Comandos del service:**
+
+- Build: `pnpm install && pnpm build`
+- Start: `node dist/server.js`
+- Pre-deploy / migraciones: `pnpm db:migrate` (una vez por deploy)
+- Health check: `/health/ready`
+
+**Variables de entorno** (ver tabla arriba):
+
+- `NODE_ENV=production`
+- `DATABASE_URL` (la DB gestionada)
+- `TRUST_PROXY` con el número de capas de reverse proxy por delante (lo más común: `1`; sumá una si hay CDN/proxy extra tipo Cloudflare). Vacío solo en local sin proxy.
+- Secrets fuertes: `openssl rand -base64 48` para `JWT_SECRET`, `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`.
+- `FRONTEND_URL` con el origin exacto del frontend desplegado (CORS con credenciales).
+
+El runtime queda fijado por `engines.node` / `.nvmrc` (Node 24): asegurate de que el hosting respete esa versión o configurá el runtime en consecuencia.
+
+Nota: `.env.test` (valores dummy) está versionado a propósito para que CI corra la suite sin secrets; el `.env` real nunca se pushea.
 
 ## Documentación API
 

@@ -14,6 +14,10 @@ import { logger } from "./lib/logger.js";
 
 const app = express();
 
+if (env.trustProxy !== undefined) {
+  app.set("trust proxy", env.trustProxy);
+}
+
 app.use(helmet());
 app.use(
   cors({
