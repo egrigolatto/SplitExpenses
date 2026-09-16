@@ -196,7 +196,7 @@ Este backend está escrito como server clásico de proceso largo (pool de conexi
 - Pre-deploy / migraciones: `pnpm db:migrate` (una vez por deploy)
 - Health check: `/health/ready`
 
-Alternativa: deployar directamente este repo con Docker (`server/Dockerfile`, target `prod`). La imagen aplica migraciones sola al arrancar y ya trae el healthcheck del compose, así que no hace falta configurar build/start en el hosting: basta con que soporte contenedores y exponga `DATABASE_URL` apuntando a la DB gestionada.
+Alternativa: deployar directamente este repo con Docker (`server/Dockerfile`, target `prod`). La imagen aplica migraciones sola al arrancar y ya trae el healthcheck del compose, así que no hace falta configurar build/start en el hosting: basta con que soporte contenedores (en Render, runtime Docker requiere plan pago).
 
 **Variables de entorno** (ver tabla arriba):
 
@@ -209,6 +209,30 @@ Alternativa: deployar directamente este repo con Docker (`server/Dockerfile`, ta
 El runtime queda fijado por `engines.node` / `.nvmrc` (Node 24): asegurate de que el hosting respete esa versión o configurá el runtime en consecuencia.
 
 Nota: `.env.test` (valores dummy) está versionado a propósito para que CI corra la suite sin secrets; el `.env` real nunca se pushea.
+
+### Deploy actual: Render (plan free) + Supabase
+
+La infraestructura está declarada como código en **`render.yaml`** (raíz del repo): [Render Blueprint](https://docs.render.com/blueprints/) crea/actualiza el servicio a partir de ese archivo. Pasos:
+
+1. **Supabase** → crear proyecto en región **US West (Oregon)** (misma que `region: oregon` de Render). Para la connection string usar el **shared pooler en Session mode** (Connect → Connection pooling, host `aws-0-*.pooler.supabase.com`, usuario `postgres.<ref>`, puerto **5432**) y agregarle `?sslmode=require`. Razones: Render solo sale por IPv4 (la conexión directa `db.*.supabase.co` es IPv6-only; el add-on IPv4 es pago), el puerto 6543 (transaction mode) rompe sesiones (migraciones), y este server ya trae `pg.Pool` propio.
+2. **Render** → New → **Blueprint** → repo, branch `develop`. Render lee `render.yaml` y pedirá una sola vez los 3 valores marcados `sync: false` (`DATABASE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` — los de Google se copian de tu `.env` local). Los 3 secrets JWT los genera Render con `generateValue: true`.
+3. **Google Cloud Console** → en el OAuth client, agregar a _Authorized redirect URIs_ el URI con el dominio real: `https://<servicio>.onrender.com/api/v1/auth/google/callback`. Si el nombre final difiere del de `render.yaml`, actualizar `GOOGLE_REDIRECT_URI` en el servicio.
+4. **Verificar el deploy:**
+
+   ```bash
+   curl https://<dominio>/health/ready   # → "database":true
+   # Swagger: https://<dominio>/docs
+   # Supabase Table Editor: __drizzle_migrations con 9 filas, users con la fila de prueba
+   ```
+
+Detalles del setup free a tener en cuenta:
+
+- **Spin-down**: la instancia free duerme tras 15 min sin tráfico y despierta con el primer request (~1 min). El job de limpieza de refresh tokens no corre mientras duerme (se re-arrastra al arrancar: purga al boot).
+- **Migraciones**: corre `node scripts/migrate.js` como _pre-deploy command_ en cada deploy; una migración rota falla el deploy sin tumbar la versión en producción. Para adelantar una migración a mano: `DATABASE_URL="<pooler>" pnpm db:migrate` desde tu máquina.
+- **`FRONTEND_URL`** hoy es un placeholder (`http://localhost:5173`, el schema lo exige como URL válida). Cuando se despliegue el frontend, actualizarla en `render.yaml` al origin exacto (CORS con credenciales exige coincidencia total).
+- **Rate limiting en memoria**: válido para 1 instancia; si se escala a varias réplicas, el límite por IP deja de ser correcto (migrar a un store compartido).
+- Si el build native no detecta pnpm: `buildCommand: corepack enable && corepack prepare pnpm@11.15.1 --activate && pnpm install --frozen-lockfile && pnpm build`.
+- Si el free tier hiciera restart-loops con el healthcheck: quitar `healthCheckPath` del `render.yaml` (no afecta a la app).
 
 ## Documentación API
 
