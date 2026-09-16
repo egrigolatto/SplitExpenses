@@ -228,7 +228,7 @@ La infraestructura está declarada como código en **`render.yaml`** (raíz del 
 Detalles del setup free a tener en cuenta:
 
 - **Spin-down**: la instancia free duerme tras 15 min sin tráfico y despierta con el primer request (~1 min). El job de limpieza de refresh tokens no corre mientras duerme (se re-arrastra al arrancar: purga al boot).
-- **Migraciones**: corre `node scripts/migrate.js` como _pre-deploy command_ en cada deploy; una migración rota falla el deploy sin tumbar la versión en producción. Para adelantar una migración a mano: `DATABASE_URL="<pooler>" pnpm db:migrate` desde tu máquina.
+- **Migraciones**: el plan free no soporta _pre-deploy command_, así que corren dentro del `startCommand` (`node scripts/migrate.js && exec node dist/server.js`): son idempotentes (si ya están aplicadas, noop). Si una migración está rota, el arranque falla y Render conserva la versión anterior. Para adelantarlas a mano: `DATABASE_URL="<pooler>" pnpm db:migrate` desde tu máquina.
 - **`FRONTEND_URL`** hoy es un placeholder (`http://localhost:5173`, el schema lo exige como URL válida). Cuando se despliegue el frontend, actualizarla en `render.yaml` al origin exacto (CORS con credenciales exige coincidencia total).
 - **Rate limiting en memoria**: válido para 1 instancia; si se escala a varias réplicas, el límite por IP deja de ser correcto (migrar a un store compartido).
 - Si el build native no detecta pnpm: `buildCommand: corepack enable && corepack prepare pnpm@11.15.1 --activate && pnpm install --frozen-lockfile && pnpm build`.

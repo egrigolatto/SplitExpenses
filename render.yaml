@@ -11,12 +11,14 @@ services:
     name: split-expenses-api # -> https://split-expenses-api.onrender.com
     runtime: node
     plan: free
-    region: oregon # misma region que Supabase us-west-1 (AWS Oregon)
+    region: oregon # misma region que Supabase us-west-2 (AWS Oregon)
     branch: develop
     rootDir: server
     buildCommand: pnpm install --frozen-lockfile && pnpm build
-    preDeployCommand: node scripts/migrate.js # migraciones ANTES de reemplazar la version corriendo
-    startCommand: node dist/server.js
+    # El plan free de Render no soporta preDeployCommand: las migraciones
+    # corren aca, idempotentes (si ya estan aplicadas, es un noop).
+    # El "exec" hace que node reciba las señales (graceful shutdown).
+    startCommand: node scripts/migrate.js && exec node dist/server.js
     healthCheckPath: /health
     autoDeployTrigger: commit # cada push a develop = deploy
     envVars:
