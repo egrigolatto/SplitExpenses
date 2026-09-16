@@ -27,7 +27,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false # Supabase shared pooler (session mode, :5432) + "?sslmode=require"
+        sync: false # Supabase shared pooler (session mode, :5432) + "?sslmode=no-verify"
+                    # (no "require": con pg 8.x verifica la CA y el cert self-signed de
+                    #  Supavisor crashea el arranque con SELF_SIGNED_CERT_IN_CHAIN)
       - key: JWT_SECRET
         generateValue: true
       - key: ACCESS_TOKEN_SECRET
