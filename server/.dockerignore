@@ -1,0 +1,14 @@
+node_modules
+.pnpm-store
+dist
+.env
+.env.test
+tests
+requests
+docs
+*.md
+.husky
+eslint.config.mjs
+vitest.config.ts
+tsconfig.eslint.json
+.gitignore

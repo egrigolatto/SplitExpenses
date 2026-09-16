@@ -17,7 +17,7 @@ Backend de Split Expenses: API REST construida con Express 5, TypeScript, Drizzl
 1. Levantar PostgreSQL:
 
    ```bash
-   docker compose up -d   # desde la raíz del repo
+   docker compose up -d   # desde la raíz del repo (solo levanta la DB; ver sección Docker)
    ```
 
 2. Instalar dependencias:
@@ -41,6 +41,48 @@ Backend de Split Expenses: API REST construida con Express 5, TypeScript, Drizzl
    ```
 
 La API queda disponible en `http://localhost:3000/api/v1` y la documentación Swagger en `http://localhost:3000/docs`.
+
+## Docker
+
+El server está contenerizado con un `Dockerfile` multi-stage (Node 24 slim, pnpm 11). En el `docker-compose.yml` de la raíz hay **dos perfiles** para el server, más el servicio `postgres` que siempre levanta:
+
+| Comando                                       | Modo           | Qué corre                                             |
+| --------------------------------------------- | -------------- | ----------------------------------------------------- |
+| `docker compose up -d`                        | Solo DB        | únicamente `postgres` (los servers están en profiles) |
+| `docker compose --profile dev up`             | **Desarrollo** | postgres + `pnpm db:migrate && pnpm dev` (hot reload) |
+| `docker compose --profile prod up -d --build` | **Producción** | postgres + imagen mínima con migraciones + compiled   |
+
+> Los servicios `server` y `server-dev` usan [compose profiles](https://docs.docker.com/compose/how-tos/profiles/), así que `docker compose up` sin perfil no levanta ninguno de los dos (por eso el paso 1 del setup local sigue usando la DB contenerizada sin pelearse con tu `pnpm dev`).
+
+### Modo desarrollo
+
+```bash
+docker compose --profile dev up          # postgres + server con hot reload
+docker compose --profile dev logs -f server-dev
+```
+
+- La carpeta `server/` va montada dentro del contenedor (`./server:/app`): cualquier cambio en `src/` reinicia el server solo (tsx watch).
+- `node_modules` vive en un volumen nombrado (`server_node_modules`) para que convivan el `node_modules` de la imagen (Linux) con tu carpeta local, sin pisarse.
+- Env: se lee `server/.env` vía `env_file`, y `DATABASE_URL` queda pisada por la del servicio (host `postgres`, no `localhost`), así que la DB contenerizada funciona sin tocar el `.env`.
+- Si cambian dependencias (`package.json`), hay que reconstruir la imagen: `docker compose --profile dev build server-dev`.
+
+### Modo producción
+
+```bash
+docker compose --profile prod up -d --build
+```
+
+- La imagen final contiene solo `dist/`, `node_modules` de producción, las migraciones y `scripts/migrate.js`; corre como usuario no-root.
+- Al arrancar aplica migraciones automáticamente (`node scripts/migrate.js`, usa el migrador de `drizzle-orm`, sin `drizzle-kit`) y luego levanta `node dist/server.js`.
+- Healthcheck: `/health` (compose + `depends_on` de postgres con `pg_isready`).
+
+### Testear una imagen
+
+```bash
+curl localhost:3000/health          # liveness
+curl localhost:3000/health/ready    # readiness (checa DB)
+docker compose ps --all             # estado/salud de los contenedores
+```
 
 ## Variables de entorno
 
@@ -153,6 +195,8 @@ Este backend está escrito como server clásico de proceso largo (pool de conexi
 - Start: `node dist/server.js`
 - Pre-deploy / migraciones: `pnpm db:migrate` (una vez por deploy)
 - Health check: `/health/ready`
+
+Alternativa: deployar directamente este repo con Docker (`server/Dockerfile`, target `prod`). La imagen aplica migraciones sola al arrancar y ya trae el healthcheck del compose, así que no hace falta configurar build/start en el hosting: basta con que soporte contenedores y exponga `DATABASE_URL` apuntando a la DB gestionada.
 
 **Variables de entorno** (ver tabla arriba):
 

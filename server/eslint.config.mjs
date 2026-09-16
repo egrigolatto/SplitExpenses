@@ -23,6 +23,16 @@ export default [
     },
   },
   {
+    files: ["scripts/**/*.js"],
+    languageOptions: {
+      sourceType: "module",
+      globals: {
+        process: "readonly",
+        console: "readonly",
+      },
+    },
+  },
+  {
     ignores: ["dist", "node_modules"],
   },
 ];
