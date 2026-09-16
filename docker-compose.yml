@@ -17,5 +17,75 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d split_expenses"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Modo producción: docker compose --profile prod up -d
+  server:
+    profiles: ["prod"]
+
+    build:
+      context: ./server
+      target: prod
+
+    container_name: split-expenses-api
+
+    restart: unless-stopped
+
+    env_file: server/.env
+
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/split_expenses
+      TRUST_PROXY: ""
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Modo desarrollo (hot reload): docker compose --profile dev up
+  server-dev:
+    profiles: ["dev"]
+
+    build:
+      context: ./server
+      target: dev
+
+    container_name: split-expenses-api-dev
+
+    env_file: server/.env
+
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/split_expenses
+      TRUST_PROXY: ""
+
+    command: sh -c "pnpm db:migrate && pnpm dev"
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ./server:/app
+      - server_node_modules:/app/node_modules
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
+  server_node_modules:
