@@ -27,19 +27,19 @@ En caso de conflicto, este documento precisa esas reglas para el frontend, no la
 
 # Stack
 
-| Herramienta          | Propósito                        |
-| -------------------- | -------------------------------- |
-| React 19             | Biblioteca principal             |
-| TypeScript (strict)  | Tipado estático                  |
-| Vite                 | Build tool y dev server          |
-| React Router         | Enrutamiento                     |
-| TanStack Query       | Estado del servidor              |
-| Zustand              | Estado global de la interfaz     |
-| React Hook Form      | Manejo de formularios            |
-| Zod                  | Validación                       |
-| Axios                | Cliente HTTP                     |
-| Tailwind CSS         | Estilos                          |
-| Vitest + RTL         | Tests unitarios y de componentes |
+| Herramienta         | Propósito                        |
+| ------------------- | -------------------------------- |
+| React 19            | Biblioteca principal             |
+| TypeScript (strict) | Tipado estático                  |
+| Vite                | Build tool y dev server          |
+| React Router        | Enrutamiento                     |
+| TanStack Query      | Estado del servidor              |
+| Zustand             | Estado global de la interfaz     |
+| React Hook Form     | Manejo de formularios            |
+| Zod                 | Validación                       |
+| Axios               | Cliente HTTP                     |
+| Tailwind CSS        | Estilos                          |
+| Vitest + RTL        | Tests unitarios y de componentes |
 
 No agregar dependencias nuevas sin justificarlas en el PR.
 
