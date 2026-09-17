@@ -104,6 +104,13 @@ Desktop.ini
 !.vscode/tasks.json
 
 # =========================
+# Agent skills
+# =========================
+# Skills versionadas en .agents/ + skills-lock.json; los symlinks
+# por agente (Claude Code) se regeneran con `npx skills add`.
+.claude/
+
+# =========================
 # Misc
 # =========================
 *.pem
