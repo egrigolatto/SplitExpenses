@@ -14,8 +14,8 @@ COPY src ./src
 RUN pnpm build
 
 # ── Stage prod-deps: solo dependencias de producción ──
-# --ignore-scripts: saltea el "prepare: husky" del package root (husky es devDep y no existe acá).
-# Es seguro: argon2 trae prebuilds linux-x64 (.glibc.node) que se cargan en runtime, no en install.
+# --ignore-scripts: ninguna dep de producción requiere postinstall;
+# argon2 trae prebuilds linux-x64 (.glibc.node) que se cargan en runtime.
 FROM base AS prod-deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts

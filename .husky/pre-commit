@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+staged_files() {
+  git diff --cached --name-only
+}
+
+if staged_files | grep -q '^server/'; then
+  echo "[pre-commit] lint-staged en server/"
+  (cd server && pnpm exec lint-staged) || exit 1
+fi
+
+if staged_files | grep -q '^client/'; then
+  echo "[pre-commit] lint-staged en client/"
+  (cd client && pnpm exec lint-staged) || exit 1
+fi
