@@ -86,6 +86,59 @@ services:
       postgres:
         condition: service_healthy
 
+  # Modo producción: docker compose --profile prod up -d
+  client:
+    profiles: ["prod"]
+
+    build:
+      context: ./client
+      target: prod
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+
+    container_name: split-expenses-web
+
+    restart: unless-stopped
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      server:
+        condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # Modo desarrollo (hot reload): docker compose --profile dev up
+  client-dev:
+    profiles: ["dev"]
+
+    build:
+      context: ./client
+      target: dev
+
+    container_name: split-expenses-web-dev
+
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - ./client:/app
+      - client_node_modules:/app/node_modules
+
+    depends_on:
+      server-dev:
+        condition: service_started
+
 volumes:
   postgres_data:
   server_node_modules:
+  client_node_modules:
