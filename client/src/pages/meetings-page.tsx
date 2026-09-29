@@ -54,7 +54,12 @@ export function MeetingsPage() {
                 className="flex items-center justify-between gap-3 rounded border border-neutral-200 bg-white px-4 py-3"
               >
                 <div className="flex flex-col">
-                  <span className="font-medium">{meeting.name}</span>
+                  <Link
+                    to={`/mis-reuniones/${meeting.id}`}
+                    className="rounded font-medium hover:underline focus-visible:outline-2 focus-visible:outline-offset-1"
+                  >
+                    {meeting.name}
+                  </Link>
                   <span className="text-sm text-neutral-500">
                     {formatMeetingDate(meeting.meetingDate)} · {meeting.participants.length}{" "}
                     {meeting.participants.length === 1 ? "participante" : "participantes"}

@@ -85,6 +85,8 @@ describe("MeetingsPage", () => {
     renderPage();
 
     const first = await screen.findByText("Asado");
+
+    expect(first).toHaveAttribute("href", "/mis-reuniones/a0000000-0000-4000-8000-000000000001");
     expect(first.closest("li")).toHaveTextContent("29/07/2026");
     expect(first.closest("li")).toHaveTextContent("1 participante");
     expect(first.closest("li")).toHaveTextContent(/\$\s?180,00/);

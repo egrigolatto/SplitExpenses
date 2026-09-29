@@ -15,11 +15,41 @@ export function useMeetingsQuery(page: number) {
   });
 }
 
+export function useMeetingQuery(id: string) {
+  return useQuery({
+    queryKey: [...MEETINGS_QUERY_KEY, id] as const,
+    queryFn: () => meetingsService.get(id),
+  });
+}
+
 export function useSaveMeetingMutation() {
   const client = useQueryClient();
 
   return useMutation({
     mutationFn: (input: CreateMeetingRequest) => meetingsService.create(input),
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: MEETINGS_QUERY_KEY });
+    },
+  });
+}
+
+export function useRenameMeetingMutation(id: string) {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: (name: string) => meetingsService.update(id, { name }),
+    onSuccess: (meeting) => {
+      client.setQueryData([...MEETINGS_QUERY_KEY, id], meeting);
+      client.invalidateQueries({ queryKey: MEETINGS_QUERY_KEY });
+    },
+  });
+}
+
+export function useDeleteMeetingMutation() {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => meetingsService.remove(id),
     onSuccess: () => {
       client.invalidateQueries({ queryKey: MEETINGS_QUERY_KEY });
     },

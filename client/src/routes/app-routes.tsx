@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router";
 import { RootLayout } from "../layouts/root-layout";
 import { HomePage } from "../pages/home-page";
 import { LoginPage } from "../pages/login-page";
+import { MeetingDetailPage } from "../pages/meeting-detail-page";
 import { MeetingFormPage } from "../pages/meeting-form-page";
 import { MeetingSummaryPage } from "../pages/meeting-summary-page";
 import { MeetingsPage } from "../pages/meetings-page";
@@ -22,7 +23,10 @@ export const appRoutes = createBrowserRouter([
       { path: "reuniones/resumen", element: <MeetingSummaryPage /> },
       {
         element: <ProtectedRoute />,
-        children: [{ path: "mis-reuniones", element: <MeetingsPage /> }],
+        children: [
+          { path: "mis-reuniones", element: <MeetingsPage /> },
+          { path: "mis-reuniones/:id", element: <MeetingDetailPage /> },
+        ],
       },
       { path: "*", element: <NotFoundPage /> },
     ],
