@@ -1,19 +1,47 @@
-import { render, screen, within } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { PublicUser } from "../schemas/user.schema";
+import { ApiRequestError } from "../services/http-client";
+import { authService } from "../services/auth.service";
 import { useMeetingDraft } from "../store/meeting-draft";
 import { MeetingFormPage } from "./meeting-form-page";
 
+vi.mock("../services/auth.service", () => ({
+  authService: {
+    me: vi.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
+    logout: vi.fn(),
+  },
+}));
+
+const USER_FIXTURE: PublicUser = {
+  id: "3f2504e0-4f89-41d3-9a0c-0305e82c3301",
+  name: "Ana",
+  email: "ana@email.com",
+  googleId: null,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
+
 function renderForm() {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+
   render(
-    <MemoryRouter initialEntries={["/reuniones/nueva"]}>
-      <Routes>
-        <Route path="/reuniones/nueva" element={<MeetingFormPage />} />
-        <Route path="/reuniones/resumen" element={<p>resumen de prueba</p>} />
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={["/reuniones/nueva"]}>
+        <Routes>
+          <Route path="/reuniones/nueva" element={<MeetingFormPage />} />
+          <Route path="/reuniones/resumen" element={<p>resumen de prueba</p>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
@@ -35,9 +63,43 @@ async function fillParticipant(
 
 beforeEach(() => {
   useMeetingDraft.getState().clearDraft();
+  vi.mocked(authService.me).mockReset();
+  vi.mocked(authService.me).mockRejectedValue(new ApiRequestError(401, "Authentication required"));
 });
 
 describe("MeetingFormPage", () => {
+  it("precarga la fila Yo con el nombre de la sesion cuando hay usuario autenticado", async () => {
+    vi.mocked(authService.me).mockResolvedValue(USER_FIXTURE);
+    renderForm();
+
+    const selfName = within(getGroup("Yo")).getByRole("textbox", { name: "Yo" });
+
+    await waitFor(() => expect(selfName).toHaveValue("Ana"));
+  });
+
+  it("no precarga el nombre cuando no hay sesion", () => {
+    renderForm();
+
+    expect(within(getGroup("Yo")).getByRole("textbox", { name: "Yo" })).toHaveValue("");
+  });
+
+  it("respeta el nombre del draft por encima de la sesion", async () => {
+    vi.mocked(authService.me).mockResolvedValue(USER_FIXTURE);
+    useMeetingDraft.getState().setDraft({
+      meetingName: "",
+      participants: [
+        { name: "Sofi", paidAmount: 10 },
+        { name: "Beto", paidAmount: 0 },
+      ],
+    });
+
+    renderForm();
+
+    expect(within(getGroup("Yo")).getByRole("textbox", { name: "Yo" })).toHaveValue("Sofi");
+    await waitFor(() => expect(authService.me).toHaveBeenCalled());
+    expect(within(getGroup("Yo")).getByRole("textbox", { name: "Yo" })).toHaveValue("Sofi");
+  });
+
   it("renderiza la fila personal sin boton de eliminar y exige tres filas para poder eliminar", () => {
     renderForm();
 
@@ -143,6 +205,18 @@ describe("MeetingFormPage", () => {
     expect(
       within(getGroup("Participante 1")).getByRole("textbox", { name: "Monto pagado" }),
     ).toHaveValue("40");
+  });
+
+  it("asigna un nombre con la fecha al draft cuando la reunion queda sin nombre", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await fillParticipant(user, "Yo", "Ana", "100");
+    await fillParticipant(user, "Participante 1", "Beto", "40");
+    await user.click(screen.getByRole("button", { name: "Calcular" }));
+
+    await screen.findByText("resumen de prueba");
+    expect(useMeetingDraft.getState().draft?.meetingName).toMatch(/^Reunión \d{2}\/\d{2}\/\d{4}$/);
   });
 
   it("guarda el draft y navega al resumen con datos validos", async () => {

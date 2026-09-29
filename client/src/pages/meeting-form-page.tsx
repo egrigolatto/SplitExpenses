@@ -1,14 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 
 import { ParticipantRow } from "../components/participant-row";
+import { useSession } from "../hooks/use-session";
 import {
   meetingFormSchema,
   type MeetingFormInput,
   type MeetingFormValues,
 } from "../schemas/meeting-form.schema";
 import { useMeetingDraft } from "../store/meeting-draft";
+import { resolveMeetingName } from "../utils/meeting-name";
 
 const INITIAL_PARTICIPANTS: MeetingFormInput["participants"] = [
   { name: "", paidAmount: "" },
@@ -17,6 +20,7 @@ const INITIAL_PARTICIPANTS: MeetingFormInput["participants"] = [
 
 export function MeetingFormPage() {
   const navigate = useNavigate();
+  const { user } = useSession();
   const draft = useMeetingDraft((state) => state.draft);
   const setDraft = useMeetingDraft((state) => state.setDraft);
 
@@ -24,6 +28,8 @@ export function MeetingFormPage() {
     control,
     register,
     handleSubmit,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm<MeetingFormInput, unknown, MeetingFormValues>({
     resolver: zodResolver(meetingFormSchema),
@@ -41,10 +47,20 @@ export function MeetingFormPage() {
 
   const { fields, append, remove } = useFieldArray({ control, name: "participants" });
 
+  useEffect(() => {
+    if (draft !== null || user === null) {
+      return;
+    }
+
+    if (getValues("participants.0.name") === "") {
+      setValue("participants.0.name", user.name);
+    }
+  }, [draft, user, getValues, setValue]);
+
   const participantsError = errors.participants?.root?.message ?? errors.root?.message;
 
   function onSubmit(values: MeetingFormValues) {
-    setDraft({ meetingName: values.name, participants: values.participants });
+    setDraft({ meetingName: resolveMeetingName(values.name), participants: values.participants });
     navigate("/reuniones/resumen");
   }
 

@@ -1,34 +1,99 @@
-import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ApiRequestError } from "../services/http-client";
+import type { PublicUser } from "../schemas/user.schema";
+import { authService } from "../services/auth.service";
 import { RootLayout } from "./root-layout";
 
+vi.mock("../services/auth.service", () => ({
+  authService: {
+    me: vi.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
+    logout: vi.fn(),
+  },
+}));
+
+const USER_FIXTURE: PublicUser = {
+  id: "3f2504e0-4f89-41d3-9a0c-0305e82c3301",
+  name: "Ana",
+  email: "ana@email.com",
+  googleId: null,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
+
 function renderLayout() {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+
   render(
-    <MemoryRouter>
-      <Routes>
-        <Route element={<RootLayout />}>
-          <Route index element={<p>contenido de la pagina</p>} />
-        </Route>
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={client}>
+      <MemoryRouter>
+        <Routes>
+          <Route element={<RootLayout />}>
+            <Route index element={<p>contenido de la pagina</p>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
+beforeEach(() => {
+  vi.mocked(authService.me).mockReset();
+});
+
 describe("RootLayout", () => {
-  it("muestra la marca que enlaza al inicio", () => {
+  it("muestra la marca que enlaza al inicio", async () => {
+    vi.mocked(authService.me).mockRejectedValue(
+      new ApiRequestError(401, "Authentication required"),
+    );
     renderLayout();
 
-    const brand = screen.getByRole("link", { name: "Split Expenses" });
+    const brand = await screen.findByRole("link", { name: "Split Expenses" });
 
-    expect(brand).toBeInTheDocument();
     expect(brand).toHaveAttribute("href", "/");
   });
 
-  it("renderiza el contenido de la ruta activa dentro del main", () => {
+  it("renderiza el contenido de la ruta activa dentro del main", async () => {
+    vi.mocked(authService.me).mockRejectedValue(
+      new ApiRequestError(401, "Authentication required"),
+    );
     renderLayout();
 
-    expect(screen.getByRole("main")).toHaveTextContent("contenido de la pagina");
+    const main = await screen.findByRole("main");
+
+    expect(main).toHaveTextContent("contenido de la pagina");
+  });
+
+  it("ofrece iniciar y crear sesion cuando no hay usuario", async () => {
+    vi.mocked(authService.me).mockRejectedValue(
+      new ApiRequestError(401, "Authentication required"),
+    );
+    renderLayout();
+
+    const nav = await screen.findByRole("navigation", { name: "Cuenta" });
+
+    expect(within(nav).getByRole("link", { name: "Iniciar sesión" })).toHaveAttribute(
+      "href",
+      "/login",
+    );
+    expect(within(nav).getByRole("link", { name: "Crear cuenta" })).toHaveAttribute(
+      "href",
+      "/register",
+    );
+  });
+
+  it("muestra el usuario y el cierre de sesion cuando esta autenticado", async () => {
+    vi.mocked(authService.me).mockResolvedValue(USER_FIXTURE);
+    renderLayout();
+
+    expect(await screen.findByText("Ana")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
   });
 });
