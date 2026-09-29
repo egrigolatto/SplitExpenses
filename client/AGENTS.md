@@ -197,6 +197,7 @@ Toda respuesta se valida con un esquema Zod del envelope antes de usarse.
 - Toda utilidad de `utils/` con lógica de cálculo tiene tests unitarios.
 - Flujos críticos con test de componente: formulario de reunión, resumen, login.
 - Mockear `services/` (no axios interno) en tests de componentes.
+- Mantener el aislamiento por archivo en Vitest: los `vi.mock` no pueden compartirse entre archivos. Antes de pushear cambios de testing, verificar con `pnpm vitest run --fileParallelism=false` (peor caso de contaminación entre archivos).
 - No dejar tests para el final: cada feature mergea con sus tests.
 
 ---
