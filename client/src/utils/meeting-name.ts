@@ -1,8 +1,4 @@
-const dateFormatter = new Intl.DateTimeFormat("es-AR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-});
+import { formatDate } from "./format";
 
 export function resolveMeetingName(name: string, date: Date = new Date()): string {
   const trimmed = name.trim();
@@ -11,5 +7,5 @@ export function resolveMeetingName(name: string, date: Date = new Date()): strin
     return trimmed;
   }
 
-  return `Reunión ${dateFormatter.format(date)}`;
+  return `Reunión ${formatDate(date)}`;
 }

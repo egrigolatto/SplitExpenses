@@ -34,7 +34,13 @@ export function RootLayout() {
                 </Link>
               </nav>
             ) : (
-              <div className="flex items-center gap-3 text-sm">
+              <nav aria-label="Cuenta" className="flex items-center gap-4 text-sm">
+                <Link
+                  to="/mis-reuniones"
+                  className="rounded font-medium underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+                >
+                  Mis reuniones
+                </Link>
                 <span className="font-medium">{user.name}</span>
                 <button
                   type="button"
@@ -43,7 +49,7 @@ export function RootLayout() {
                 >
                   Cerrar sesión
                 </button>
-              </div>
+              </nav>
             ))}
         </div>
       </header>

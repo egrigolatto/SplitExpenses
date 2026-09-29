@@ -89,11 +89,18 @@ describe("RootLayout", () => {
     );
   });
 
-  it("muestra el usuario y el cierre de sesion cuando esta autenticado", async () => {
+  it("muestra el usuario, el historial y el cierre de sesion cuando esta autenticado", async () => {
     vi.mocked(authService.me).mockResolvedValue(USER_FIXTURE);
     renderLayout();
 
     expect(await screen.findByText("Ana")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
+
+    const nav = await screen.findByRole("navigation", { name: "Cuenta" });
+
+    expect(within(nav).getByRole("link", { name: "Mis reuniones" })).toHaveAttribute(
+      "href",
+      "/mis-reuniones",
+    );
+    expect(within(nav).getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
   });
 });
