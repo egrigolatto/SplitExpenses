@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -84,6 +84,8 @@ async function renderApp(path: string) {
   const { App } = await import("./app");
 
   render(<App />);
+
+  await waitFor(() => expect(screen.queryByText("Cargando...")).toBeNull());
 }
 
 async function fillAsado(user: ReturnType<typeof userEvent.setup>) {

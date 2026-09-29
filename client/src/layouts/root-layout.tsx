@@ -1,8 +1,10 @@
-import { Link, Outlet } from "react-router";
+import { Suspense } from "react";
+import { Link, Outlet, useNavigate } from "react-router";
 
 import { useLogoutMutation, useSession } from "../hooks/use-session";
 
 export function RootLayout() {
+  const navigate = useNavigate();
   const { user, isLoading } = useSession();
   const logout = useLogoutMutation();
 
@@ -44,7 +46,7 @@ export function RootLayout() {
                 <span className="font-medium">{user.name}</span>
                 <button
                   type="button"
-                  onClick={() => logout.mutate()}
+                  onClick={() => logout.mutate(undefined, { onSettled: () => navigate("/") })}
                   className="rounded px-2 py-1 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-1"
                 >
                   Cerrar sesión
@@ -55,7 +57,15 @@ export function RootLayout() {
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6">
-        <Outlet />
+        <Suspense
+          fallback={
+            <p role="status" className="text-sm text-neutral-600">
+              Cargando...
+            </p>
+          }
+        >
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

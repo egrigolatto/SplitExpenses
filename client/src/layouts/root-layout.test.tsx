@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -26,17 +27,18 @@ const USER_FIXTURE: PublicUser = {
   updatedAt: "2026-01-01T00:00:00.000Z",
 };
 
-function renderLayout() {
+function renderLayout(initialPath = "/") {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 
   render(
     <QueryClientProvider client={client}>
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[initialPath]}>
         <Routes>
           <Route element={<RootLayout />}>
             <Route index element={<p>contenido de la pagina</p>} />
+            <Route path="otro" element={<p>otra pagina</p>} />
           </Route>
         </Routes>
       </MemoryRouter>
@@ -46,6 +48,8 @@ function renderLayout() {
 
 beforeEach(() => {
   vi.mocked(authService.me).mockReset();
+  vi.mocked(authService.logout).mockReset();
+  vi.mocked(authService.logout).mockResolvedValue(undefined);
 });
 
 describe("RootLayout", () => {
@@ -102,5 +106,18 @@ describe("RootLayout", () => {
       "/mis-reuniones",
     );
     expect(within(nav).getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
+  });
+
+  it("cerrar sesion navega siempre al inicio", async () => {
+    const user = userEvent.setup();
+    vi.mocked(authService.me).mockResolvedValue(USER_FIXTURE);
+    renderLayout("/otro");
+
+    await screen.findByText("otra pagina");
+    await screen.findByRole("button", { name: "Cerrar sesión" });
+    await user.click(screen.getByRole("button", { name: "Cerrar sesión" }));
+
+    expect(authService.logout).toHaveBeenCalled();
+    expect(await screen.findByText("contenido de la pagina")).toBeInTheDocument();
   });
 });

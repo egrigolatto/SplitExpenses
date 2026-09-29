@@ -43,7 +43,7 @@ export function useLogoutMutation() {
   return useMutation({
     mutationFn: () => authService.logout(),
     onSuccess: () => {
-      client.setQueryData(SESSION_QUERY_KEY, null);
+      client.clear();
     },
   });
 }
