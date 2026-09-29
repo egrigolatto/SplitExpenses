@@ -127,6 +127,24 @@ describe("MeetingFormPage", () => {
     expect(screen.queryByText("resumen de prueba")).toBeNull();
   });
 
+  it("hidrata el formulario con la reunion ya cargada en el draft", () => {
+    useMeetingDraft.getState().setDraft({
+      meetingName: "Asado",
+      participants: [
+        { name: "Ana", paidAmount: 100 },
+        { name: "Beto", paidAmount: 40 },
+      ],
+    });
+
+    renderForm();
+
+    expect(screen.getByLabelText(/Nombre de reunión/)).toHaveValue("Asado");
+    expect(within(getGroup("Yo")).getByRole("textbox", { name: "Yo" })).toHaveValue("Ana");
+    expect(
+      within(getGroup("Participante 1")).getByRole("textbox", { name: "Monto pagado" }),
+    ).toHaveValue("40");
+  });
+
   it("guarda el draft y navega al resumen con datos validos", async () => {
     const user = userEvent.setup();
     renderForm();

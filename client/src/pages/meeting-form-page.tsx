@@ -17,6 +17,7 @@ const INITIAL_PARTICIPANTS: MeetingFormInput["participants"] = [
 
 export function MeetingFormPage() {
   const navigate = useNavigate();
+  const draft = useMeetingDraft((state) => state.draft);
   const setDraft = useMeetingDraft((state) => state.setDraft);
 
   const {
@@ -26,7 +27,16 @@ export function MeetingFormPage() {
     formState: { errors },
   } = useForm<MeetingFormInput, unknown, MeetingFormValues>({
     resolver: zodResolver(meetingFormSchema),
-    defaultValues: { name: "", participants: INITIAL_PARTICIPANTS },
+    defaultValues: {
+      name: draft?.meetingName ?? "",
+      participants:
+        draft === null
+          ? INITIAL_PARTICIPANTS
+          : draft.participants.map((participant) => ({
+              name: participant.name,
+              paidAmount: String(participant.paidAmount),
+            })),
+    },
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: "participants" });
