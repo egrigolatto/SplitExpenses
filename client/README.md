@@ -1,0 +1,85 @@
+# Split Expenses — Client
+
+SPA de Split Expenses: repartimiento de gastos entre personas, construida con React 19 + TypeScript + Vite. Consume la API REST de `../server`.
+
+## Stack
+
+- **Build/Dev:** Vite 8
+- **UI:** React 19 + Tailwind CSS 4
+- **Routing:** React Router 7
+- **Estado del servidor:** TanStack Query
+- **Estado de UI:** Zustand
+- **Formularios:** React Hook Form + Zod (con `@hookform/resolvers`)
+- **HTTP:** Axios (cookies HttpOnly con `withCredentials`)
+- **Testing:** Vitest + React Testing Library
+- **Calidad:** ESLint (flat config) + Prettier + husky/lint-staged (hooks en la raíz del repo)
+
+## Setup local
+
+1. Copiar `.env.example` a `.env` (la única variable es `VITE_API_URL`).
+
+2. Instalar dependencias:
+
+   ```bash
+   pnpm install
+   ```
+
+3. Levantar el dev server:
+
+   ```bash
+   pnpm dev
+   ```
+
+La app queda disponible en `http://localhost:5173` y espera la API en `http://localhost:3000` (ver `../server/README.md`).
+
+## Scripts
+
+| Comando             | Qué hace                                             |
+| ------------------- | ---------------------------------------------------- |
+| `pnpm dev`          | Dev server de Vite con hot reload                    |
+| `pnpm build`        | Typecheck (`tsc -b`) + build de producción a `dist/` |
+| `pnpm preview`      | Sirve el build localmente                            |
+| `pnpm lint`         | ESLint                                               |
+| `pnpm format`       | Prettier --write                                     |
+| `pnpm format:check` | Prettier --check (lo usa CI)                         |
+| `pnpm test`         | Vitest run                                           |
+| `pnpm test:watch`   | Vitest en modo watch                                 |
+
+## Docker
+
+El `Dockerfile` es multi-stage: `dev` (Node + pnpm + hot reload) y `prod` (imagen mínima `nginx:alpine` sirviendo `dist/` con fallback SPA). En el `docker-compose.yml` de la raíz:
+
+| Comando                                       | Modo           | Qué corre                                              |
+| --------------------------------------------- | -------------- | ------------------------------------------------------ |
+| `docker compose --profile dev up`             | **Desarrollo** | postgres + server-dev (`:3000`) + client-dev (`:5173`) |
+| `docker compose --profile prod up -d --build` | **Producción** | postgres + server (`:3000`) + nginx (`:8080`)          |
+
+Notas:
+
+- Las variables `VITE_*` se embeben en el bundle **al build**: en el servicio `client` de producción se pasan por `build.args`.
+- `localhost:5173` ↔ `localhost:3000` son _same-site_ para el navegador (SameSite ignora el puerto), así que las cookies HttpOnly de sesión viajan bien con `withCredentials` en desarrollo y en el compose de producción (`:8080` ↔ `:3000`).
+- Tras cambiar dependencias en el host, `docker compose --profile dev restart client-dev` re-sincroniza el `node_modules` del contenedor contra el lockfile.
+
+## Estructura
+
+```text
+src/
+├── components/   # componentes reutilizables (filas de participantes, tablas, listas)
+├── pages/        # una pantalla por ruta
+├── layouts/      # RootLayout: header + <Outlet/>
+├── hooks/        # use-session (auth), use-meetings (queries/mutaciones)
+├── services/     # axios + auth/meetings/health; único lugar que toca HTTP
+├── store/        # Zustand: draft de reunión (UI state)
+├── schemas/      # Zod: formularios + respuestas de API
+├── types/        # tipos de dominio
+├── routes/       # createBrowserRouter + ProtectedRoute
+└── utils/        # funciones puras: cálculo del reparto, formatos
+```
+
+La lógica de cálculo del reparto vive en `src/utils/split-expenses.ts` (aritmética en centavos, mínimo de transferencias) y no depende de React ni de la red.
+
+## Documentación
+
+- `AGENTS.md` → convenciones y reglas para agentes/desarrollo en este directorio.
+- `../docs/api-design.md` → contrato de la API (envelope, auth con cookies + refresh).
+- `../docs/coding-standards.md` → estándares del repo.
