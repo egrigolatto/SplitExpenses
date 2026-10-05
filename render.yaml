@@ -44,6 +44,8 @@ services:
         value: 30d
       - key: COOKIE_NAME
         value: access_token
+      - key: COOKIE_SAME_SITE
+        value: "none" # el frontend vive en otro site (web vs api); none fuerza Secure (HTTPS)
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
@@ -51,6 +53,25 @@ services:
       - key: GOOGLE_REDIRECT_URI
         value: https://split-expenses-api.onrender.com/api/v1/auth/google/callback
       - key: FRONTEND_URL
-        value: http://localhost:5173 # placeholder; actualizar cuando exista el frontend real
+        value: https://split-expenses-web.onrender.com # origin permitido por CORS + destino del post-OAuth
       - key: TRUST_PROXY
         value: "1" # Render pone un reverse proxy delante (+1 mas si algun dia hay CDN tipo Cloudflare)
+
+  # SPA del frontend: Render la build y la sirve desde un CDN global.
+  # Sin plan/region/startCommand (los static sites no corren un proceso):
+  # solo se build el bundle estatico de Vite y se publica dist/.
+  # Las rutas desconocidas sirven index.html automaticamente (fallback SPA).
+  # VITE_API_URL se embebe en el bundle AL BUILD (no en runtime): es build-time env.
+  - type: web
+    name: split-expenses-web # -> https://split-expenses-web.onrender.com
+    runtime: static
+    branch: develop
+    rootDir: client
+    buildCommand: pnpm install --frozen-lockfile && pnpm build
+    staticPublishPath: ./dist
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: VITE_API_URL
+        value: https://split-expenses-api.onrender.com
