@@ -246,6 +246,45 @@ Repository
 Database
 ```
 
+## Arquitectura del frontend
+
+El frontend (SPA React en `client/`) separa la lógica de dominio del resto:
+
+```text
+src/
+│
+├── routes/        definiciones y guardas de rutas
+├── pages/         una pantalla por archivo
+├── layouts/       envolventes (header, shell)
+├── components/    componentes reutilizables
+├── hooks/         custom hooks (sesión, reuniones)
+├── services/      comunicación con la API (única capa que usa axios)
+├── store/         estado global de interfaz (Zustand)
+├── schemas/       esquemas Zod (formularios y respuestas)
+├── utils/         funciones puras (incluye el cálculo del reparto)
+└── config/        validación de variables de entorno
+```
+
+Flujo del MVP anónimo:
+
+```text
+Home
+   │
+   ▼
+Formulario de reunión (RHF + Zod)
+   │
+   ▼
+Draft (Zustand)
+   │
+   ▼
+Cálculo puro (utils/split-expenses)
+   │
+   ▼
+Resumen → (si hay sesión) POST /meetings
+```
+
+Regla de estado: TanStack Query es el único dueño del estado que viene de la API; Zustand solo guarda estado de interfaz. Nunca datos del servidor duplicados en el store.
+
 ---
 
 # Stack tecnológico
@@ -295,6 +334,68 @@ Database
 - Supertest
 - Docker
 - GitHub Actions
+
+---
+
+# Estructura del repositorio
+
+```text
+SplitExpenses/
+│
+├── client/            SPA React (Vite + TypeScript)
+├── server/            API REST (Express + Drizzle + PostgreSQL)
+├── docs/              api-design, database-design, coding-standards, notas
+├── .github/workflows  CI (jobs server y client en paralelo)
+├── docker-compose.yml postgres + servers (profiles dev/prod)
+└── render.yaml        blueprint del API en producción
+```
+
+Husky y lint-staged viven en la **raíz**: el pre-commit corre las verificaciones de `server/` y/o `client/` según los archivos staged de cada lado.
+
+---
+
+# Cómo ejecutar
+
+Requisitos: Node 24, pnpm 11 (ver `devEngines` en cada `package.json`) y Docker para la base de datos.
+
+## Modo local (recomendado para desarrollo)
+
+PostgreSQL contenerizado + cada proceso en el host:
+
+```bash
+docker compose up -d              # solo la base de datos (:5432)
+
+cd server && cp .env.example .env && pnpm install && pnpm db:migrate && pnpm dev
+cd client && cp .env.example .env && pnpm install && pnpm dev
+```
+
+| Servicio | URL |
+| -------- | --- |
+| API | http://localhost:3000 (Swagger en /docs) |
+| Web | http://localhost:5173 |
+
+`client/.env` necesita `VITE_API_URL=http://localhost:3000` y `server/.env` necesita `FRONTEND_URL=http://localhost:5173` (para CORS y cookies).
+
+## Modo Docker (todo contenerizado)
+
+```bash
+docker compose --profile dev up        # postgres + API (hot reload) + web (Vite)
+```
+
+Mismos puertos que en modo local (3000 y 5173). No mezclar: si corre el server del compose, no levantar `pnpm dev` en el host (pelean por el puerto 3000).
+
+## Build de producción (local)
+
+```bash
+docker compose --profile prod up -d --build   # nginx con el bundle en :8080 + API compilada en :3000
+```
+
+El compose de producción inyecta `VITE_API_URL` como build arg y `FRONTEND_URL` vía environment (ambas apuntan a `localhost` para pruebas locales).
+
+## Scripts
+
+En `server/` y `client/`: `pnpm dev` · `pnpm build` · `pnpm lint` · `pnpm format` · `pnpm test`.
+En `server/` además: `pnpm db:generate` · `pnpm db:migrate` · `pnpm db:studio`.
 
 ---
 
