@@ -70,6 +70,13 @@ services:
     buildCommand: pnpm install --frozen-lockfile && pnpm build
     staticPublishPath: ./dist
     autoDeployTrigger: commit
+    # Fallback SPA: cualquier ruta sin archivo real sirve index.html y
+    # React Router decide (deep-links /login, /mis-reuniones/:id, y la 404 de app).
+    # Los assets existentes (/assets/*) se sirven primero: la regla no los toca.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: NODE_VERSION
         value: "24"
