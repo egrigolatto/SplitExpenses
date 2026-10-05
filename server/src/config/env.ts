@@ -16,6 +16,7 @@ export const env = {
   accessTokenExpiresIn: parsedEnv.ACCESS_TOKEN_EXPIRES_IN,
   refreshTokenExpiresIn: parsedEnv.REFRESH_TOKEN_EXPIRES_IN,
   cookieName: parsedEnv.COOKIE_NAME,
+  cookieSameSite: parsedEnv.COOKIE_SAME_SITE,
   googleClientId: parsedEnv.GOOGLE_CLIENT_ID,
   googleClientSecret: parsedEnv.GOOGLE_CLIENT_SECRET,
   googleRedirectUri: parsedEnv.GOOGLE_REDIRECT_URI,

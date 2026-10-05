@@ -6,6 +6,10 @@ export const refreshCookieName = `${env.cookieName}_refresh`;
 
 const COOKIE_SECURE = env.nodeEnv === "production";
 
+// SameSite=none exige Secure en el navegador; con lax/strict,
+// Secure queda atado a produccion (el dev local corre en http).
+const cookieSecure = env.cookieSameSite === "none" ? true : COOKIE_SECURE;
+
 export function setAuthCookies(
   res: Response,
   {
@@ -18,16 +22,16 @@ export function setAuthCookies(
 ) {
   res.cookie(env.cookieName, accessToken, {
     httpOnly: true,
-    secure: COOKIE_SECURE,
-    sameSite: "lax",
+    secure: cookieSecure,
+    sameSite: env.cookieSameSite,
     path: "/",
   });
 
   if (refreshToken) {
     res.cookie(refreshCookieName, refreshToken, {
       httpOnly: true,
-      secure: COOKIE_SECURE,
-      sameSite: "lax",
+      secure: cookieSecure,
+      sameSite: env.cookieSameSite,
       path: "/api/v1/auth",
     });
   }

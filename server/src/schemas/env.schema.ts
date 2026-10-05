@@ -26,6 +26,8 @@ export const envSchema = z.object({
 
   COOKIE_NAME: z.string(),
 
+  COOKIE_SAME_SITE: z.enum(["strict", "lax", "none"]).default("lax"),
+
   GOOGLE_CLIENT_ID: z.string(),
 
   GOOGLE_CLIENT_SECRET: z.string(),
