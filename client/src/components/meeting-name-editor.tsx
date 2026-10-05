@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from "react";
 
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+
 interface MeetingNameEditorProps {
   name: string;
   isPending: boolean;
@@ -14,18 +17,17 @@ export function MeetingNameEditor({ name, isPending, onRename }: MeetingNameEdit
   if (!editing) {
     return (
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-semibold">{name}</h1>
-        <button
-          type="button"
+        <h1 className="text-2xl font-bold tracking-tight">{name}</h1>
+        <Button
+          variant="link"
           onClick={() => {
             setValue(name);
             setError(null);
             setEditing(true);
           }}
-          className="rounded text-sm font-medium underline underline-offset-4 hover:text-neutral-600 focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           Editar nombre
-        </button>
+        </Button>
       </div>
     );
   }
@@ -49,34 +51,31 @@ export function MeetingNameEditor({ name, isPending, onRename }: MeetingNameEdit
       <label htmlFor="meeting-rename" className="sr-only">
         Nombre de la reunión
       </label>
-      <input
+      <Input
         id="meeting-rename"
         value={value}
         onChange={(event) => setValue(event.target.value)}
         maxLength={120}
+        invalid={error !== null}
         aria-invalid={error !== null}
         aria-describedby={error !== null ? "meeting-rename-error" : undefined}
-        className="rounded border border-neutral-300 px-3 py-1.5 text-lg font-semibold focus-visible:outline-2 focus-visible:outline-offset-1"
+        className="w-64 font-semibold text-lg"
       />
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
-      >
+      <Button type="submit" variant="primary" size="sm" disabled={isPending}>
         Guardar
-      </button>
-      <button
-        type="button"
+      </Button>
+      <Button
+        variant="secondary"
+        size="sm"
         onClick={() => {
           setEditing(false);
           setError(null);
         }}
-        className="rounded border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
       >
         Cancelar
-      </button>
+      </Button>
       {error !== null && (
-        <p id="meeting-rename-error" role="alert" className="w-full text-sm text-red-600">
+        <p id="meeting-rename-error" role="alert" className="w-full text-sm text-rose-600">
           {error}
         </p>
       )}

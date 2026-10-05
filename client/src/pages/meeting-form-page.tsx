@@ -4,6 +4,9 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 
 import { ParticipantRow } from "../components/participant-row";
+import { Button } from "../components/ui/button";
+import { Field } from "../components/ui/field";
+import { Input } from "../components/ui/input";
 import { useSession } from "../hooks/use-session";
 import {
   meetingFormSchema,
@@ -66,27 +69,25 @@ export function MeetingFormPage() {
 
   return (
     <section className="mx-auto flex w-full max-w-xl flex-col gap-6">
-      <h1 className="text-2xl font-semibold">Nueva reunión</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Nueva reunión</h1>
 
       <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="meeting-name" className="text-sm font-medium">
-            Nombre de reunión <span className="font-normal text-neutral-500">(opcional)</span>
-          </label>
-          <input
+        <Field
+          htmlFor="meeting-name"
+          label="Nombre de reunión"
+          hint="(opcional)"
+          error={errors.name?.message}
+        >
+          <Input
             id="meeting-name"
             placeholder="Asado del sábado"
+            invalid={errors.name !== undefined}
             aria-invalid={errors.name !== undefined}
             aria-describedby={errors.name ? "meeting-name-error" : undefined}
-            className="w-full rounded border border-neutral-300 px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-1"
+            className="w-full"
             {...register("name")}
           />
-          {errors.name !== undefined && (
-            <p id="meeting-name-error" role="alert" className="text-sm text-red-600">
-              {errors.name.message}
-            </p>
-          )}
-        </div>
+        </Field>
 
         <div className="flex flex-col gap-3">
           <h2 className="text-sm font-medium">Participantes</h2>
@@ -104,27 +105,25 @@ export function MeetingFormPage() {
             />
           ))}
 
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
+            className="self-start"
             onClick={() => append({ name: "", paidAmount: "" })}
-            className="self-start rounded border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
           >
             Agregar participante
-          </button>
+          </Button>
 
           {participantsError !== undefined && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-rose-600">
               {participantsError}
             </p>
           )}
         </div>
 
-        <button
-          type="submit"
-          className="self-start rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2"
-        >
+        <Button type="submit" variant="primary" size="md" className="self-start">
           Calcular
-        </button>
+        </Button>
       </form>
     </section>
   );

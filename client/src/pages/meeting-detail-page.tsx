@@ -4,6 +4,9 @@ import { Link, Navigate, useNavigate, useParams } from "react-router";
 import { BalancesTable } from "../components/balances-table";
 import { MeetingNameEditor } from "../components/meeting-name-editor";
 import { TransfersList } from "../components/transfers-list";
+import { Button } from "../components/ui/button";
+import { buttonClass } from "../components/ui/button-styles";
+import { Card } from "../components/ui/card";
 import {
   useDeleteMeetingMutation,
   useMeetingQuery,
@@ -50,7 +53,7 @@ function MeetingDetail({ meeting }: { meeting: MeetingWithParticipants }) {
   );
 
   return (
-    <section className="flex flex-col gap-8">
+    <section className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
         <MeetingNameEditor
           name={meeting.name}
@@ -58,23 +61,26 @@ function MeetingDetail({ meeting }: { meeting: MeetingWithParticipants }) {
           onRename={(name) => rename.mutate(name)}
         />
         <p className="text-sm text-neutral-600">
-          {formatMeetingDate(meeting.meetingDate)} · {formatAmount(split.totalAmount)} ·{" "}
-          {meeting.participants.length}{" "}
+          {formatMeetingDate(meeting.meetingDate)} ·{" "}
+          <strong className="font-semibold tabular-nums text-neutral-900">
+            {formatAmount(split.totalAmount)}
+          </strong>{" "}
+          · {meeting.participants.length}{" "}
           {meeting.participants.length === 1 ? "participante" : "participantes"}
         </p>
         {rename.error !== null && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-rose-600">
             {describeSaveError(rename.error)}
           </p>
         )}
       </header>
 
-      <div className="flex flex-col gap-3">
+      <Card className="flex flex-col gap-4 p-5">
         <h2 className="text-lg font-semibold">Saldos</h2>
         <BalancesTable balances={split.balances} />
-      </div>
+      </Card>
 
-      <div className="flex flex-col gap-3">
+      <Card className="flex flex-col gap-4 p-5">
         <h2 className="text-lg font-semibold">
           Transferencias
           {split.transfers.length > 0 && (
@@ -84,13 +90,10 @@ function MeetingDetail({ meeting }: { meeting: MeetingWithParticipants }) {
           )}
         </h2>
         <TransfersList transfers={split.transfers} />
-      </div>
+      </Card>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Link
-          to="/mis-reuniones"
-          className="rounded border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-        >
+        <Link to="/mis-reuniones" className={buttonClass("secondary", "sm")}>
           Volver al historial
         </Link>
 
@@ -103,36 +106,28 @@ function MeetingDetail({ meeting }: { meeting: MeetingWithParticipants }) {
             <span className="font-medium">
               ¿Eliminar esta reunión? Esta acción no se puede deshacer.
             </span>
-            <button
-              type="button"
+            <Button
+              variant="danger"
+              size="sm"
+              disabled={remove.isPending}
               onClick={() =>
                 remove.mutate(meeting.id, { onSuccess: () => navigate("/mis-reuniones") })
               }
-              disabled={remove.isPending}
-              className="rounded bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
             >
               {remove.isPending ? "Eliminando..." : "Confirmar eliminación"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setConfirmingDelete(false)}
-              className="rounded border border-neutral-300 bg-white px-4 py-2 font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-            >
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => setConfirmingDelete(false)}>
               Cancelar
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => setConfirmingDelete(true)}
-            className="rounded border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-1"
-          >
+          <Button variant="dangerOutline" size="sm" onClick={() => setConfirmingDelete(true)}>
             Eliminar reunión
-          </button>
+          </Button>
         )}
 
         {remove.error !== null && (
-          <p role="alert" className="w-full text-sm text-red-600">
+          <p role="alert" className="w-full text-sm text-rose-600">
             {describeSaveError(remove.error)}
           </p>
         )}
@@ -160,14 +155,11 @@ export function MeetingDetailPage() {
   if (isError) {
     return (
       <section className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold">Reunión</h1>
-        <p role="alert" className="text-sm text-red-600">
+        <h1 className="text-2xl font-bold tracking-tight">Reunión</h1>
+        <p role="alert" className="text-sm text-rose-600">
           No se pudo cargar la reunión. Puede que ya no exista.
         </p>
-        <Link
-          to="/mis-reuniones"
-          className="self-start rounded border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-        >
+        <Link to="/mis-reuniones" className={buttonClass("secondary", "sm", "self-start")}>
           Volver al historial
         </Link>
       </section>

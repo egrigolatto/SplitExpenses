@@ -1,35 +1,39 @@
 import { Link } from "react-router";
 
+import { buttonClass } from "../components/ui/button-styles";
 import { useSession } from "../hooks/use-session";
 
 export function HomePage() {
   const { user } = useSession();
 
   return (
-    <section className="flex flex-col items-center gap-6 pt-12 text-center">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Split Expenses</h1>
-        <p className="text-neutral-600">
-          Repartí gastos entre varias personas y saldá deudas con el mínimo de transferencias.
-        </p>
-      </div>
+    <section className="pt-4 sm:pt-8">
+      <div className="relative overflow-hidden rounded-3xl bg-neutral-950 px-6 py-16 text-center sm:px-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-28 left-1/2 h-72 w-150 -translate-x-1/2 rounded-full bg-brand-600/40 blur-3xl"
+        />
 
-      <div className="flex flex-wrap justify-center gap-3">
-        <Link
-          to="/reuniones/nueva"
-          className="rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2"
-        >
-          Nueva reunión
-        </Link>
+        <div className="relative flex flex-col items-center gap-3">
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            Split Expenses
+          </h1>
+          <p className="max-w-md text-balance text-neutral-300">
+            Repartí gastos entre varias personas y saldá deudas con el mínimo de transferencias.
+          </p>
 
-        {user !== null && (
-          <Link
-            to="/mis-reuniones"
-            className="rounded border border-neutral-300 bg-white px-6 py-2.5 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-          >
-            Mis reuniones
-          </Link>
-        )}
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link to="/reuniones/nueva" className={buttonClass("primary", "md")}>
+              Nueva reunión
+            </Link>
+
+            {user !== null && (
+              <Link to="/mis-reuniones" className={buttonClass("inverse", "md")}>
+                Mis reuniones
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );

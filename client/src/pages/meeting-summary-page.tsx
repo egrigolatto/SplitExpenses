@@ -3,6 +3,9 @@ import { Link, Navigate } from "react-router";
 
 import { BalancesTable } from "../components/balances-table";
 import { TransfersList } from "../components/transfers-list";
+import { Button } from "../components/ui/button";
+import { buttonClass } from "../components/ui/button-styles";
+import { Card } from "../components/ui/card";
 import { useSaveMeetingMutation } from "../hooks/use-meetings";
 import { useSession } from "../hooks/use-session";
 import { ApiRequestError } from "../services/http-client";
@@ -45,74 +48,76 @@ export function MeetingSummaryPage() {
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-xl flex-col gap-8">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">
+    <section className="mx-auto flex w-full max-w-xl flex-col gap-6">
+      <header className="flex flex-col gap-1 pt-2">
+        <h1 className="text-3xl font-bold tracking-tight">
           {draft.meetingName === "" ? "Resumen" : draft.meetingName}
         </h1>
         <p className="text-sm text-neutral-600">
-          Total gastado: <strong>{formatAmount(result.totalAmount)}</strong>
+          Total gastado:{" "}
+          <strong className="font-semibold tabular-nums text-neutral-900">
+            {formatAmount(result.totalAmount)}
+          </strong>
           {" · "}
           {result.balances.length} participantes
         </p>
       </header>
 
-      <div className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Saldos</h2>
-        <BalancesTable balances={result.balances} />
-      </div>
+      <Card tone="dark" className="flex flex-col gap-4 p-5 sm:p-6">
+        <h2 className="text-lg font-semibold text-white">Saldos</h2>
+        <BalancesTable balances={result.balances} dark />
+      </Card>
 
-      <div className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">
+      <Card tone="dark" className="flex flex-col gap-4 p-5 sm:p-6">
+        <h2 className="text-lg font-semibold text-white">
           Transferencias
           {result.transfers.length > 0 && (
-            <span className="ml-2 text-sm font-normal text-neutral-500">
+            <span className="ml-2 text-sm font-normal text-neutral-400">
               ({result.transfers.length})
             </span>
           )}
         </h2>
-        <TransfersList transfers={result.transfers} />
-      </div>
+        <TransfersList transfers={result.transfers} dark />
+      </Card>
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-3">
-          <Link
-            to="/reuniones/nueva"
-            className="rounded border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-          >
+          <Link to="/reuniones/nueva" className={buttonClass("secondary", "sm")}>
             Volver a editar
           </Link>
-          <Link
-            to="/"
-            onClick={clearDraft}
-            className="rounded border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-          >
+          <Link to="/" onClick={clearDraft} className={buttonClass("secondary", "sm")}>
             Empezar de nuevo
           </Link>
 
           {user !== null &&
             (saveMeeting.isSuccess ? (
-              <p role="status" className="text-sm font-medium text-green-700">
+              <p role="status" className="text-sm font-medium text-emerald-700">
                 Reunión guardada.{" "}
-                <Link to="/mis-reuniones" className="underline">
+                <Link
+                  to="/mis-reuniones"
+                  className="underline underline-offset-4 hover:text-emerald-800"
+                >
                   Ver en Mis reuniones
                 </Link>
               </p>
             ) : (
-              <button
-                type="button"
-                onClick={() => saveMeeting.mutate(buildCreateMeetingRequest(draft))}
+              <Button
+                variant="primary"
+                size="sm"
                 disabled={saveMeeting.isPending}
-                className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+                onClick={() => saveMeeting.mutate(buildCreateMeetingRequest(draft))}
               >
                 {saveMeeting.isPending ? "Guardando..." : "Guardar reunión"}
-              </button>
+              </Button>
             ))}
         </div>
 
         {user === null && (
           <p className="text-sm text-neutral-600">
-            <Link to="/login" className="font-medium underline">
+            <Link
+              to="/login"
+              className="font-medium text-brand-700 underline underline-offset-4 hover:text-brand-800"
+            >
               Iniciá sesión
             </Link>{" "}
             para guardar esta reunión en tu historial.
@@ -120,7 +125,7 @@ export function MeetingSummaryPage() {
         )}
 
         {saveMeeting.error !== null && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-rose-600">
             {describeSaveError(saveMeeting.error)}
           </p>
         )}
