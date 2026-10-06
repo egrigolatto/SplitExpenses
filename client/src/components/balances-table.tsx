@@ -3,7 +3,6 @@ import type { ParticipantBalance } from "../utils/split-expenses";
 
 interface BalancesTableProps {
   balances: ParticipantBalance[];
-  dark?: boolean;
 }
 
 function balanceLabel(balance: ParticipantBalance): string {
@@ -18,16 +17,12 @@ function balanceLabel(balance: ParticipantBalance): string {
   return "En cero";
 }
 
-export function BalancesTable({ balances, dark = false }: BalancesTableProps) {
-  const headClass = dark ? "border-brand-400/25 text-neutral-300" : "border-neutral-200";
-  const rowClass = dark ? "border-white/10" : "border-neutral-100";
-  const mutedClass = dark ? "text-neutral-300" : "text-neutral-900";
-
+export function BalancesTable({ balances }: BalancesTableProps) {
   return (
     <table className="w-full border-collapse text-sm">
       <caption className="sr-only">Saldos por participante</caption>
       <thead>
-        <tr className={`border-b text-left ${headClass}`}>
+        <tr className="border-b border-brand-400/25 text-left text-neutral-300">
           <th scope="col" className="py-2 pr-2 font-medium">
             Participante
           </th>
@@ -44,25 +39,21 @@ export function BalancesTable({ balances, dark = false }: BalancesTableProps) {
       </thead>
       <tbody>
         {balances.map((balance, index) => (
-          <tr key={`${balance.name}-${index}`} className={`border-b last:border-0 ${rowClass}`}>
-            <td className={`py-2 pr-2 font-medium ${dark ? "text-white" : ""}`}>{balance.name}</td>
-            <td className={`py-2 pr-2 text-right tabular-nums ${mutedClass}`}>
+          <tr key={`${balance.name}-${index}`} className="border-b border-white/10 last:border-0">
+            <td className="py-2 pr-2 font-medium text-white">{balance.name}</td>
+            <td className="py-2 pr-2 text-right text-neutral-300 tabular-nums">
               {formatAmount(balance.paidAmount)}
             </td>
-            <td className={`py-2 pr-2 text-right tabular-nums ${mutedClass}`}>
+            <td className="py-2 pr-2 text-right text-neutral-300 tabular-nums">
               {formatAmount(balance.shareAmount)}
             </td>
             <td
               className={`py-2 text-right font-medium tabular-nums ${
                 balance.balance > 0
-                  ? dark
-                    ? "text-emerald-400"
-                    : "text-emerald-700"
+                  ? "text-emerald-400"
                   : balance.balance < 0
-                    ? dark
-                      ? "text-rose-400"
-                      : "text-rose-700"
-                    : "text-neutral-500"
+                    ? "text-rose-400"
+                    : "text-neutral-400"
               }`}
             >
               {balanceLabel(balance)}

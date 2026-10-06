@@ -53,9 +53,9 @@ export function MeetingSummaryPage() {
         <h1 className="text-3xl font-bold tracking-tight">
           {draft.meetingName === "" ? "Resumen" : draft.meetingName}
         </h1>
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-neutral-400">
           Total gastado:{" "}
-          <strong className="font-semibold tabular-nums text-neutral-900">
+          <strong className="font-semibold tabular-nums text-neutral-100">
             {formatAmount(result.totalAmount)}
           </strong>
           {" · "}
@@ -63,12 +63,12 @@ export function MeetingSummaryPage() {
         </p>
       </header>
 
-      <Card tone="dark" className="flex flex-col gap-4 p-5 sm:p-6">
+      <Card tone="accent" className="flex flex-col gap-4 p-5 sm:p-6">
         <h2 className="text-lg font-semibold text-white">Saldos</h2>
-        <BalancesTable balances={result.balances} dark />
+        <BalancesTable balances={result.balances} />
       </Card>
 
-      <Card tone="dark" className="flex flex-col gap-4 p-5 sm:p-6">
+      <Card tone="accent" className="flex flex-col gap-4 p-5 sm:p-6">
         <h2 className="text-lg font-semibold text-white">
           Transferencias
           {result.transfers.length > 0 && (
@@ -77,7 +77,7 @@ export function MeetingSummaryPage() {
             </span>
           )}
         </h2>
-        <TransfersList transfers={result.transfers} dark />
+        <TransfersList transfers={result.transfers} />
       </Card>
 
       <div className="flex flex-col gap-4">
@@ -91,11 +91,11 @@ export function MeetingSummaryPage() {
 
           {user !== null &&
             (saveMeeting.isSuccess ? (
-              <p role="status" className="text-sm font-medium text-emerald-700">
+              <p role="status" className="text-sm font-medium text-emerald-400">
                 Reunión guardada.{" "}
                 <Link
                   to="/mis-reuniones"
-                  className="underline underline-offset-4 hover:text-emerald-800"
+                  className="underline underline-offset-4 hover:text-emerald-300"
                 >
                   Ver en Mis reuniones
                 </Link>
@@ -113,10 +113,10 @@ export function MeetingSummaryPage() {
         </div>
 
         {user === null && (
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-neutral-400">
             <Link
               to="/login"
-              className="font-medium text-brand-700 underline underline-offset-4 hover:text-brand-800"
+              className="font-medium text-brand-300 underline underline-offset-4 hover:text-brand-200"
             >
               Iniciá sesión
             </Link>{" "}
@@ -125,7 +125,7 @@ export function MeetingSummaryPage() {
         )}
 
         {saveMeeting.error !== null && (
-          <p role="alert" className="text-sm text-rose-600">
+          <p role="alert" className="text-sm text-rose-400">
             {describeSaveError(saveMeeting.error)}
           </p>
         )}

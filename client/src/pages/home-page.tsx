@@ -8,7 +8,7 @@ export function HomePage() {
 
   return (
     <section className="pt-4 sm:pt-8">
-      <div className="relative overflow-hidden rounded-3xl bg-neutral-950 px-6 py-16 text-center sm:px-10">
+      <div className="relative overflow-hidden rounded-3xl bg-neutral-950 px-6 py-16 text-center ring-1 ring-brand-500/25 sm:px-10">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -top-28 left-1/2 h-72 w-150 -translate-x-1/2 rounded-full bg-brand-600/40 blur-3xl"

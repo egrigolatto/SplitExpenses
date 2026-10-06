@@ -13,8 +13,8 @@ export function RootLayout() {
     "rounded-lg font-medium text-neutral-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400";
 
   return (
-    <div className="flex min-h-dvh flex-col bg-neutral-50 text-neutral-900">
-      <header className="bg-neutral-950">
+    <div className="flex min-h-dvh flex-col bg-neutral-950 text-neutral-100">
+      <header className="border-b border-white/10 bg-neutral-950">
         <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-4 sm:px-6">
           <Link
             to="/"
@@ -58,7 +58,7 @@ export function RootLayout() {
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6">
         <Suspense
           fallback={
-            <p role="status" className="text-sm text-neutral-600">
+            <p role="status" className="text-sm text-neutral-400">
               Cargando...
             </p>
           }

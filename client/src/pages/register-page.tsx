@@ -10,6 +10,7 @@ import { Button } from "../components/ui/button";
 import { buttonClass } from "../components/ui/button-styles";
 import { Card } from "../components/ui/card";
 import { Field } from "../components/ui/field";
+import { GoogleIcon } from "../components/ui/google-icon";
 import { Input } from "../components/ui/input";
 
 function describeError(error: unknown): string {
@@ -92,7 +93,7 @@ export function RegisterPage() {
           </Field>
 
           {registerAccount.error !== null && (
-            <p role="alert" className="text-sm text-rose-600">
+            <p role="alert" className="text-sm text-rose-400">
               {describeError(registerAccount.error)}
             </p>
           )}
@@ -112,15 +113,16 @@ export function RegisterPage() {
           href={`${env.VITE_API_URL}/api/v1/auth/google`}
           className={buttonClass("secondary", "md", "w-full")}
         >
+          <GoogleIcon />
           Continuar con Google
         </a>
       </Card>
 
-      <p className="text-center text-sm text-neutral-600">
+      <p className="text-center text-sm text-neutral-400">
         ¿Ya tenés cuenta?{" "}
         <Link
           to="/login"
-          className="font-medium text-brand-700 underline underline-offset-4 hover:text-brand-800"
+          className="font-medium text-brand-300 underline underline-offset-4 hover:text-brand-200"
         >
           Iniciar sesión
         </Link>

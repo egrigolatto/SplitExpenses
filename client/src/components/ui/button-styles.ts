@@ -6,18 +6,18 @@ export type ButtonVariant =
 export type ButtonSize = "sm" | "md";
 
 const baseClass =
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 disabled:pointer-events-none disabled:opacity-60";
 
 const variantClass: Record<ButtonVariant, string> = {
   primary: "bg-brand-600 text-white shadow-glow hover:bg-brand-700",
   secondary:
-    "border border-neutral-300 bg-white text-neutral-900 hover:border-brand-300 hover:bg-brand-50",
+    "border border-white/15 bg-white/5 text-brand-100 hover:border-brand-400 hover:bg-white/10 hover:text-white",
   inverse:
     "border border-white/15 bg-white/5 text-brand-100 hover:border-brand-400 hover:bg-white/10 hover:text-white",
   danger: "bg-rose-600 text-white hover:bg-rose-700",
-  dangerOutline: "border border-rose-200 bg-white text-rose-700 hover:bg-rose-50",
-  ghost: "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900",
-  link: "rounded text-brand-700 underline decoration-brand-300 underline-offset-4 hover:text-brand-800 hover:decoration-brand-500",
+  dangerOutline: "border border-rose-500/40 text-rose-300 hover:bg-rose-500/10",
+  ghost: "text-neutral-400 hover:bg-white/10 hover:text-neutral-100",
+  link: "rounded text-brand-300 underline decoration-brand-500/60 underline-offset-4 hover:text-brand-200 hover:decoration-brand-400",
 };
 
 const sizeClass: Record<ButtonSize, string> = {

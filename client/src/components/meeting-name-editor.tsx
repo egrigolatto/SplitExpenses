@@ -75,7 +75,7 @@ export function MeetingNameEditor({ name, isPending, onRename }: MeetingNameEdit
         Cancelar
       </Button>
       {error !== null && (
-        <p id="meeting-rename-error" role="alert" className="w-full text-sm text-rose-600">
+        <p id="meeting-rename-error" role="alert" className="w-full text-sm text-rose-400">
           {error}
         </p>
       )}

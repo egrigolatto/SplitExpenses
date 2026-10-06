@@ -115,7 +115,7 @@ export function MeetingFormPage() {
           </Button>
 
           {participantsError !== undefined && (
-            <p role="alert" className="text-sm text-rose-600">
+            <p role="alert" className="text-sm text-rose-400">
               {participantsError}
             </p>
           )}

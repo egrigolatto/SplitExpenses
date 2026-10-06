@@ -3,17 +3,17 @@ import type { HTMLAttributes } from "react";
 import { cx } from "../../utils/cx";
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  tone?: "light" | "dark";
+  tone?: "plain" | "accent";
 }
 
-export function Card({ tone = "light", className, ...rest }: CardProps) {
+export function Card({ tone = "plain", className, ...rest }: CardProps) {
   return (
     <div
       className={cx(
         "rounded-2xl border",
-        tone === "dark"
-          ? "border-brand-500/25 bg-neutral-950 text-neutral-100 shadow-glow"
-          : "border-neutral-200 bg-white",
+        tone === "accent"
+          ? "border-brand-500/30 bg-neutral-900 shadow-glow"
+          : "border-white/10 bg-neutral-900",
         className,
       )}
       {...rest}

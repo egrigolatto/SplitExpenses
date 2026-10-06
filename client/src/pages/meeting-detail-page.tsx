@@ -60,16 +60,16 @@ function MeetingDetail({ meeting }: { meeting: MeetingWithParticipants }) {
           isPending={rename.isPending}
           onRename={(name) => rename.mutate(name)}
         />
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-neutral-400">
           {formatMeetingDate(meeting.meetingDate)} ·{" "}
-          <strong className="font-semibold tabular-nums text-neutral-900">
+          <strong className="font-semibold tabular-nums text-neutral-100">
             {formatAmount(split.totalAmount)}
           </strong>{" "}
           · {meeting.participants.length}{" "}
           {meeting.participants.length === 1 ? "participante" : "participantes"}
         </p>
         {rename.error !== null && (
-          <p role="alert" className="text-sm text-rose-600">
+          <p role="alert" className="text-sm text-rose-400">
             {describeSaveError(rename.error)}
           </p>
         )}
@@ -84,7 +84,7 @@ function MeetingDetail({ meeting }: { meeting: MeetingWithParticipants }) {
         <h2 className="text-lg font-semibold">
           Transferencias
           {split.transfers.length > 0 && (
-            <span className="ml-2 text-sm font-normal text-neutral-500">
+            <span className="ml-2 text-sm font-normal text-neutral-400">
               ({split.transfers.length})
             </span>
           )}
@@ -127,7 +127,7 @@ function MeetingDetail({ meeting }: { meeting: MeetingWithParticipants }) {
         )}
 
         {remove.error !== null && (
-          <p role="alert" className="w-full text-sm text-rose-600">
+          <p role="alert" className="w-full text-sm text-rose-400">
             {describeSaveError(remove.error)}
           </p>
         )}
@@ -146,7 +146,7 @@ export function MeetingDetailPage() {
 
   if (isPending) {
     return (
-      <p role="status" className="text-sm text-neutral-600">
+      <p role="status" className="text-sm text-neutral-400">
         Cargando reunión...
       </p>
     );
@@ -156,7 +156,7 @@ export function MeetingDetailPage() {
     return (
       <section className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold tracking-tight">Reunión</h1>
-        <p role="alert" className="text-sm text-rose-600">
+        <p role="alert" className="text-sm text-rose-400">
           No se pudo cargar la reunión. Puede que ya no exista.
         </p>
         <Link to="/mis-reuniones" className={buttonClass("secondary", "sm", "self-start")}>

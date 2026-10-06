@@ -12,7 +12,7 @@ export function MeetingsPage() {
 
   if (isPending) {
     return (
-      <p role="status" className="text-sm text-neutral-600">
+      <p role="status" className="text-sm text-neutral-400">
         Cargando reuniones...
       </p>
     );
@@ -22,7 +22,7 @@ export function MeetingsPage() {
     return (
       <section className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold tracking-tight">Mis reuniones</h1>
-        <p role="alert" className="text-sm text-rose-600">
+        <p role="alert" className="text-sm text-rose-400">
           No se pudieron obtener las reuniones. Intentá de nuevo.
         </p>
       </section>
@@ -41,7 +41,7 @@ export function MeetingsPage() {
       </header>
 
       {items.length === 0 && (
-        <p className="text-sm text-neutral-600">Todavía no guardaste ninguna reunión.</p>
+        <p className="text-sm text-neutral-400">Todavía no guardaste ninguna reunión.</p>
       )}
 
       {items.length > 0 && (
@@ -50,21 +50,21 @@ export function MeetingsPage() {
             {items.map((meeting) => (
               <li
                 key={meeting.id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-neutral-900 px-4 py-3"
               >
                 <div className="flex flex-col">
                   <Link
                     to={`/mis-reuniones/${meeting.id}`}
-                    className="rounded-lg font-medium underline-offset-4 hover:text-brand-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500"
+                    className="rounded-lg font-medium underline-offset-4 hover:text-brand-200 hover:underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-400"
                   >
                     {meeting.name}
                   </Link>
-                  <span className="text-sm text-neutral-500">
+                  <span className="text-sm text-neutral-400">
                     {formatMeetingDate(meeting.meetingDate)} · {meeting.participants.length}{" "}
                     {meeting.participants.length === 1 ? "participante" : "participantes"}
                   </span>
                 </div>
-                <span className="text-sm font-semibold tabular-nums text-brand-800">
+                <span className="text-sm font-semibold tabular-nums text-brand-300">
                   {formatAmount(meeting.totalAmount)}
                 </span>
               </li>

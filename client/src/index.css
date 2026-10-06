@@ -30,11 +30,12 @@
 
 @layer base {
   body {
-    @apply bg-neutral-50 text-neutral-900 antialiased;
-    color-scheme: light;
+    @apply bg-neutral-950 text-neutral-100 antialiased;
+    color-scheme: dark;
   }
 
   ::selection {
-    background-color: var(--color-brand-200);
+    background-color: var(--color-brand-700);
+    color: #fff;
   }
 }

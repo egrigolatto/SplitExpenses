@@ -31,7 +31,7 @@ export function ParticipantRow({
     <div
       role="group"
       aria-label={participantLabel}
-      className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-white p-3"
+      className="flex items-start gap-3 rounded-xl border border-white/10 bg-neutral-900 p-3"
     >
       <div className="flex flex-1 flex-col gap-3 sm:flex-row">
         <div className="flex flex-1 flex-col gap-1">
@@ -48,7 +48,7 @@ export function ParticipantRow({
             {...register(`participants.${index}.name`)}
           />
           {nameError !== undefined && (
-            <p id={`${nameFieldId}-error`} role="alert" className="text-sm text-rose-600">
+            <p id={`${nameFieldId}-error`} role="alert" className="text-sm text-rose-400">
               {nameError}
             </p>
           )}
@@ -70,7 +70,7 @@ export function ParticipantRow({
             {...register(`participants.${index}.paidAmount`)}
           />
           {amountError !== undefined && (
-            <p id={`${amountFieldId}-error`} role="alert" className="text-sm text-rose-600">
+            <p id={`${amountFieldId}-error`} role="alert" className="text-sm text-rose-400">
               {amountError}
             </p>
           )}
