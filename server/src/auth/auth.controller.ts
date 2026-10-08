@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { AuthService } from "../auth/auth.service.js";
 import { UserService } from "../services/users.service.js";
-import { setAuthCookies, clearAuthCookies, refreshCookieName } from "../lib/cookies.js";
+import {
+  setAuthCookies,
+  clearAuthCookies,
+  clearRefreshCookie,
+  refreshCookieName,
+} from "../lib/cookies.js";
 
 export class AuthController {
   constructor(
@@ -47,7 +52,7 @@ export class AuthController {
       const rawRefreshToken = req.cookies[refreshCookieName] as string | undefined;
 
       if (!rawRefreshToken) {
-        res.clearCookie(refreshCookieName);
+        clearRefreshCookie(res);
         res.status(401).json({
           success: false,
           message: "Refresh token not provided",

@@ -1,4 +1,4 @@
-import type { Response } from "express";
+import type { CookieOptions, Response } from "express";
 
 import { env } from "../config/env.js";
 
@@ -10,6 +10,19 @@ const COOKIE_SECURE = env.nodeEnv === "production";
 // Secure queda atado a produccion (el dev local corre en http).
 const cookieSecure = env.cookieSameSite === "none" ? true : COOKIE_SECURE;
 
+const REFRESH_COOKIE_PATH = "/api/v1/auth";
+
+// Unicas opciones de cookies: set y clear deben emitir atributos identicos,
+// o el navegador no matchea la eliminacion (name+domain+path+secure+samesite).
+function cookieOptions(path: string): CookieOptions {
+  return {
+    httpOnly: true,
+    secure: cookieSecure,
+    sameSite: env.cookieSameSite,
+    path,
+  };
+}
+
 export function setAuthCookies(
   res: Response,
   {
@@ -20,24 +33,18 @@ export function setAuthCookies(
     refreshToken?: string | undefined;
   },
 ) {
-  res.cookie(env.cookieName, accessToken, {
-    httpOnly: true,
-    secure: cookieSecure,
-    sameSite: env.cookieSameSite,
-    path: "/",
-  });
+  res.cookie(env.cookieName, accessToken, cookieOptions("/"));
 
   if (refreshToken) {
-    res.cookie(refreshCookieName, refreshToken, {
-      httpOnly: true,
-      secure: cookieSecure,
-      sameSite: env.cookieSameSite,
-      path: "/api/v1/auth",
-    });
+    res.cookie(refreshCookieName, refreshToken, cookieOptions(REFRESH_COOKIE_PATH));
   }
 }
 
+export function clearRefreshCookie(res: Response) {
+  res.clearCookie(refreshCookieName, cookieOptions(REFRESH_COOKIE_PATH));
+}
+
 export function clearAuthCookies(res: Response) {
-  res.clearCookie(env.cookieName);
-  res.clearCookie(refreshCookieName);
+  res.clearCookie(env.cookieName, cookieOptions("/"));
+  clearRefreshCookie(res);
 }

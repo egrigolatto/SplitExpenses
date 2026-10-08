@@ -99,22 +99,29 @@ describe("setAuthCookies", () => {
 });
 
 describe("clearAuthCookies", () => {
-  it("elimina ambas cookies de autenticacion", async () => {
+  it("elimina ambas cookies replicando los atributos con los que fueron creadas", async () => {
     const { clearAuthCookies } = await loadCookies({
-      nodeEnv: "development",
-      cookieSameSite: "lax",
+      nodeEnv: "production",
+      cookieSameSite: "none",
     });
 
-    const cleared: string[] = [];
+    const cleared: Array<{ name: string; options: Record<string, unknown> }> = [];
     const res = {
-      clearCookie: (name: string) => {
-        cleared.push(name);
+      clearCookie: (name: string, options: Record<string, unknown>) => {
+        cleared.push({ name, options });
         return res;
       },
     };
 
     clearAuthCookies(res as never);
 
-    expect(cleared).toEqual(["access_token", "access_token_refresh"]);
+    expect(cleared[0]).toEqual({
+      name: "access_token",
+      options: { httpOnly: true, secure: true, sameSite: "none", path: "/" },
+    });
+    expect(cleared[1]).toEqual({
+      name: "access_token_refresh",
+      options: { httpOnly: true, secure: true, sameSite: "none", path: "/api/v1/auth" },
+    });
   });
 });
