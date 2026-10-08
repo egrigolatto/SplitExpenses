@@ -64,6 +64,13 @@
       "when": 1788734583560,
       "tag": "0008_sticky_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791494449242,
+      "tag": "0009_supabase_rls",
+      "breakpoints": true
     }
   ]
 }

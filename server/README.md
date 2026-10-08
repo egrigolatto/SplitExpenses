@@ -222,10 +222,14 @@ La infraestructura está declarada como código en **`render.yaml`** (raíz del 
    ```bash
    curl https://<dominio>/health/ready   # → "database":true
    # Swagger: https://<dominio>/docs
-   # Supabase Table Editor: __drizzle_migrations con 9 filas, users con la fila de prueba
+   # Supabase Table Editor: __drizzle_migrations con 10 filas, users con la fila de prueba
    ```
 
+   El cartel _"RLS Disabled in Public"_ de Supabase debe desaparecer (ver punto RLS abajo).
+
 Detalles del setup free a tener en cuenta:
+
+- **RLS (Row Level Security)**: la migración `0009_supabase_rls` activa RLS en modo default-deny (sin policies) sobre `users`, `meetings`, `participants` y `refresh_tokens`. Motivo: Supabase expone las tablas de `public` como API REST (PostgREST) accesible con el `anon key`; sin RLS cualquiera con el project ref puede leer hashes de contraseñas y tokens. A la API no la afecta porque conecta como el rol `postgres` (owner de las tablas → bypasea RLS). Verificación: `curl "https://<ref>.supabase.co/rest/v1/users?select=email&apikey=<anon-key>"` debe devolver `[]`.
 
 - **Spin-down**: la instancia free duerme tras 15 min sin tráfico y despierta con el primer request (~1 min). El job de limpieza de refresh tokens no corre mientras duerme (se re-arrastra al arrancar: purga al boot).
 - **Migraciones**: el plan free no soporta _pre-deploy command_, así que corren dentro del `startCommand` (`node scripts/migrate.js && exec node dist/server.js`): son idempotentes (si ya están aplicadas, noop). Si una migración está rota, el arranque falla y Render conserva la versión anterior. Para adelantarlas a mano: `DATABASE_URL="<pooler>" pnpm db:migrate` desde tu máquina.
