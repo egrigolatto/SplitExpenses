@@ -107,7 +107,7 @@ export function MeetingSummaryPage() {
                 disabled={saveMeeting.isPending}
                 onClick={() => saveMeeting.mutate(buildCreateMeetingRequest(draft))}
               >
-                {saveMeeting.isPending ? "Guardando..." : "Guardar reunión"}
+                {saveMeeting.isPending ? "Guardando…" : "Guardar reunión"}
               </Button>
             ))}
         </div>

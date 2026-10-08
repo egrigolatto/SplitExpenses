@@ -59,7 +59,7 @@ export function RootLayout() {
         <Suspense
           fallback={
             <p role="status" className="text-sm text-neutral-400">
-              Cargando...
+              Cargando…
             </p>
           }
         >

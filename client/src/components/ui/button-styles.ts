@@ -6,7 +6,7 @@ export type ButtonVariant =
 export type ButtonSize = "sm" | "md";
 
 const baseClass =
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 disabled:pointer-events-none disabled:opacity-60";
 
 const variantClass: Record<ButtonVariant, string> = {
   primary: "bg-brand-600 text-white shadow-glow hover:bg-brand-700",

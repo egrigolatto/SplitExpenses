@@ -21,7 +21,7 @@ export function TransfersList({ transfers }: TransfersListProps) {
           key={`${transfer.from}-${transfer.to}-${index}`}
           className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm"
         >
-          <span>
+          <span className="min-w-0 break-words">
             <strong className="font-semibold text-white">{transfer.from}</strong>
             <span className="text-neutral-400"> paga a </span>
             <strong className="font-semibold text-white">{transfer.to}</strong>

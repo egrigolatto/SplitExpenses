@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -13,6 +13,13 @@ export function MeetingNameEditor({ name, isPending, onRename }: MeetingNameEdit
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(name);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current?.focus();
+    }
+  }, [editing]);
 
   if (!editing) {
     return (
@@ -53,6 +60,9 @@ export function MeetingNameEditor({ name, isPending, onRename }: MeetingNameEdit
       </label>
       <Input
         id="meeting-rename"
+        name="meeting-rename"
+        autoComplete="off"
+        ref={inputRef}
         value={value}
         onChange={(event) => setValue(event.target.value)}
         maxLength={120}

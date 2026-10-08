@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
 import { Button } from "../components/ui/button";
 import { buttonClass } from "../components/ui/button-styles";
@@ -7,13 +6,19 @@ import { useMeetingsQuery } from "../hooks/use-meetings";
 import { formatAmount, formatMeetingDate } from "../utils/format";
 
 export function MeetingsPage() {
-  const [page, setPage] = useState(1);
+  const [params, setParams] = useSearchParams();
+  const rawPage = Number(params.get("page"));
+  const page = Number.isFinite(rawPage) && rawPage >= 1 ? Math.trunc(rawPage) : 1;
   const { data, isPending, isError } = useMeetingsQuery(page);
+
+  function goToPage(next: number) {
+    setParams(next <= 1 ? {} : { page: String(next) });
+  }
 
   if (isPending) {
     return (
       <p role="status" className="text-sm text-neutral-400">
-        Cargando reuniones...
+        Cargando reuniones…
       </p>
     );
   }
@@ -52,10 +57,10 @@ export function MeetingsPage() {
                 key={meeting.id}
                 className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-neutral-900 px-4 py-3"
               >
-                <div className="flex flex-col">
+                <div className="flex min-w-0 flex-col">
                   <Link
                     to={`/mis-reuniones/${meeting.id}`}
-                    className="rounded-lg font-medium underline-offset-4 hover:text-brand-200 hover:underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-400"
+                    className="break-words rounded-lg font-medium underline-offset-4 hover:text-brand-200 hover:underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-400"
                   >
                     {meeting.name}
                   </Link>
@@ -78,7 +83,7 @@ export function MeetingsPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              onClick={() => goToPage(Math.max(1, page - 1))}
               disabled={page <= 1}
             >
               Anterior
@@ -89,7 +94,7 @@ export function MeetingsPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+              onClick={() => goToPage(Math.min(totalPages, page + 1))}
               disabled={page >= totalPages}
             >
               Siguiente

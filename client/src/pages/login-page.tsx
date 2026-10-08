@@ -55,6 +55,7 @@ export function LoginPage() {
               id="login-email"
               type="email"
               autoComplete="email"
+              spellCheck={false}
               invalid={errors.email !== undefined}
               aria-invalid={errors.email !== undefined}
               aria-describedby={errors.email ? "login-email-error" : undefined}
@@ -89,7 +90,7 @@ export function LoginPage() {
             className="w-full"
             disabled={login.isPending}
           >
-            {login.isPending ? "Entrando..." : "Entrar"}
+            {login.isPending ? "Entrando…" : "Entrar"}
           </Button>
         </form>
 

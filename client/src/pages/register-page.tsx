@@ -71,6 +71,7 @@ export function RegisterPage() {
               id="register-email"
               type="email"
               autoComplete="email"
+              spellCheck={false}
               invalid={errors.email !== undefined}
               aria-invalid={errors.email !== undefined}
               aria-describedby={errors.email ? "register-email-error" : undefined}
@@ -105,7 +106,7 @@ export function RegisterPage() {
             className="w-full"
             disabled={registerAccount.isPending}
           >
-            {registerAccount.isPending ? "Creando cuenta..." : "Crear cuenta"}
+            {registerAccount.isPending ? "Creando cuenta…" : "Crear cuenta"}
           </Button>
         </form>
 

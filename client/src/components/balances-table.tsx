@@ -40,7 +40,7 @@ export function BalancesTable({ balances }: BalancesTableProps) {
       <tbody>
         {balances.map((balance, index) => (
           <tr key={`${balance.name}-${index}`} className="border-b border-white/10 last:border-0">
-            <td className="py-2 pr-2 font-medium text-white">{balance.name}</td>
+            <td className="py-2 pr-2 font-medium break-words text-white">{balance.name}</td>
             <td className="py-2 pr-2 text-right text-neutral-300 tabular-nums">
               {formatAmount(balance.paidAmount)}
             </td>

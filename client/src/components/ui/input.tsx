@@ -1,8 +1,8 @@
-import type { InputHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 
 import { cx } from "../../utils/cx";
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends ComponentProps<"input"> {
   invalid?: boolean;
 }
 

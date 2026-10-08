@@ -40,7 +40,7 @@ export function ParticipantRow({
           </label>
           <Input
             id={nameFieldId}
-            placeholder={isSelf ? "tu nombre" : "nombre"}
+            placeholder={isSelf ? "tu nombre…" : "nombre…"}
             invalid={nameError !== undefined}
             aria-invalid={nameError !== undefined}
             aria-describedby={nameError ? `${nameFieldId}-error` : undefined}
@@ -62,7 +62,7 @@ export function ParticipantRow({
             id={amountFieldId}
             type="text"
             inputMode="decimal"
-            placeholder="$"
+            placeholder="$…"
             invalid={amountError !== undefined}
             aria-invalid={amountError !== undefined}
             aria-describedby={amountError ? `${amountFieldId}-error` : undefined}

@@ -114,7 +114,7 @@ function MeetingDetail({ meeting }: { meeting: MeetingWithParticipants }) {
                 remove.mutate(meeting.id, { onSuccess: () => navigate("/mis-reuniones") })
               }
             >
-              {remove.isPending ? "Eliminando..." : "Confirmar eliminación"}
+              {remove.isPending ? "Eliminando…" : "Confirmar eliminación"}
             </Button>
             <Button variant="secondary" size="sm" onClick={() => setConfirmingDelete(false)}>
               Cancelar
@@ -147,7 +147,7 @@ export function MeetingDetailPage() {
   if (isPending) {
     return (
       <p role="status" className="text-sm text-neutral-400">
-        Cargando reunión...
+        Cargando reunión…
       </p>
     );
   }
