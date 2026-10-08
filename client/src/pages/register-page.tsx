@@ -6,9 +6,12 @@ import { env } from "../config/env";
 import { useRegisterMutation } from "../hooks/use-session";
 import { registerRequestSchema, type RegisterRequest } from "../schemas/auth.schema";
 import { ApiRequestError } from "../services/http-client";
-
-const inputClass =
-  "w-full rounded border border-neutral-300 px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-1";
+import { Button } from "../components/ui/button";
+import { buttonClass } from "../components/ui/button-styles";
+import { Card } from "../components/ui/card";
+import { Field } from "../components/ui/field";
+import { GoogleIcon } from "../components/ui/google-icon";
+import { Input } from "../components/ui/input";
 
 function describeError(error: unknown): string {
   if (error instanceof ApiRequestError) {
@@ -47,93 +50,81 @@ export function RegisterPage() {
 
   return (
     <section className="mx-auto flex w-full max-w-sm flex-col gap-6">
-      <h1 className="text-2xl font-semibold">Crear cuenta</h1>
+      <Card className="flex flex-col gap-5 p-6">
+        <h1 className="text-2xl font-bold tracking-tight">Crear cuenta</h1>
 
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="register-name" className="text-sm font-medium">
-            Nombre
-          </label>
-          <input
-            id="register-name"
-            autoComplete="name"
-            aria-invalid={errors.name !== undefined}
-            aria-describedby={errors.name ? "register-name-error" : undefined}
-            className={inputClass}
-            {...register("name")}
-          />
-          {errors.name !== undefined && (
-            <p id="register-name-error" role="alert" className="text-sm text-red-600">
-              {errors.name.message}
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Field htmlFor="register-name" label="Nombre" error={errors.name?.message}>
+            <Input
+              id="register-name"
+              autoComplete="name"
+              invalid={errors.name !== undefined}
+              aria-invalid={errors.name !== undefined}
+              aria-describedby={errors.name ? "register-name-error" : undefined}
+              className="w-full"
+              {...register("name")}
+            />
+          </Field>
+
+          <Field htmlFor="register-email" label="Email" error={errors.email?.message}>
+            <Input
+              id="register-email"
+              type="email"
+              autoComplete="email"
+              spellCheck={false}
+              invalid={errors.email !== undefined}
+              aria-invalid={errors.email !== undefined}
+              aria-describedby={errors.email ? "register-email-error" : undefined}
+              className="w-full"
+              {...register("email")}
+            />
+          </Field>
+
+          <Field htmlFor="register-password" label="Contraseña" error={errors.password?.message}>
+            <Input
+              id="register-password"
+              type="password"
+              autoComplete="new-password"
+              invalid={errors.password !== undefined}
+              aria-invalid={errors.password !== undefined}
+              aria-describedby={errors.password ? "register-password-error" : undefined}
+              className="w-full"
+              {...register("password")}
+            />
+          </Field>
+
+          {registerAccount.error !== null && (
+            <p role="alert" className="text-sm text-rose-400">
+              {describeError(registerAccount.error)}
             </p>
           )}
-        </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="register-email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="register-email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={errors.email !== undefined}
-            aria-describedby={errors.email ? "register-email-error" : undefined}
-            className={inputClass}
-            {...register("email")}
-          />
-          {errors.email !== undefined && (
-            <p id="register-email-error" role="alert" className="text-sm text-red-600">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            className="w-full"
+            disabled={registerAccount.isPending}
+          >
+            {registerAccount.isPending ? "Creando cuenta…" : "Crear cuenta"}
+          </Button>
+        </form>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="register-password" className="text-sm font-medium">
-            Contraseña
-          </label>
-          <input
-            id="register-password"
-            type="password"
-            autoComplete="new-password"
-            aria-invalid={errors.password !== undefined}
-            aria-describedby={errors.password ? "register-password-error" : undefined}
-            className={inputClass}
-            {...register("password")}
-          />
-          {errors.password !== undefined && (
-            <p id="register-password-error" role="alert" className="text-sm text-red-600">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        {registerAccount.error !== null && (
-          <p role="alert" className="text-sm text-red-600">
-            {describeError(registerAccount.error)}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={registerAccount.isPending}
-          className="rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+        <a
+          href={`${env.VITE_API_URL}/api/v1/auth/google`}
+          className={buttonClass("secondary", "md", "w-full")}
         >
-          {registerAccount.isPending ? "Creando cuenta..." : "Crear cuenta"}
-        </button>
-      </form>
+          <GoogleIcon />
+          Continuar con Google
+        </a>
+      </Card>
 
-      <a
-        href={`${env.VITE_API_URL}/api/v1/auth/google`}
-        className="rounded border border-neutral-300 bg-white px-6 py-2.5 text-center text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-      >
-        Continuar con Google
-      </a>
-
-      <p className="text-sm text-neutral-600">
+      <p className="text-center text-sm text-neutral-400">
         ¿Ya tenés cuenta?{" "}
-        <Link to="/login" className="font-medium underline">
+        <Link
+          to="/login"
+          className="font-medium text-brand-300 underline underline-offset-4 hover:text-brand-200"
+        >
           Iniciar sesión
         </Link>
       </p>

@@ -6,9 +6,12 @@ import { useLoginMutation } from "../hooks/use-session";
 import { loginRequestSchema, type LoginRequest } from "../schemas/auth.schema";
 import { env } from "../config/env";
 import { ApiRequestError } from "../services/http-client";
-
-const inputClass =
-  "w-full rounded border border-neutral-300 px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-1";
+import { Button } from "../components/ui/button";
+import { buttonClass } from "../components/ui/button-styles";
+import { Card } from "../components/ui/card";
+import { Field } from "../components/ui/field";
+import { GoogleIcon } from "../components/ui/google-icon";
+import { Input } from "../components/ui/input";
 
 function describeError(error: unknown): string {
   if (error instanceof ApiRequestError) {
@@ -43,74 +46,69 @@ export function LoginPage() {
 
   return (
     <section className="mx-auto flex w-full max-w-sm flex-col gap-6">
-      <h1 className="text-2xl font-semibold">Iniciar sesión</h1>
+      <Card className="flex flex-col gap-5 p-6">
+        <h1 className="text-2xl font-bold tracking-tight">Iniciar sesión</h1>
 
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="login-email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="login-email"
-            type="email"
-            autoComplete="email"
-            aria-invalid={errors.email !== undefined}
-            aria-describedby={errors.email ? "login-email-error" : undefined}
-            className={inputClass}
-            {...register("email")}
-          />
-          {errors.email !== undefined && (
-            <p id="login-email-error" role="alert" className="text-sm text-red-600">
-              {errors.email.message}
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Field htmlFor="login-email" label="Email" error={errors.email?.message}>
+            <Input
+              id="login-email"
+              type="email"
+              autoComplete="email"
+              spellCheck={false}
+              invalid={errors.email !== undefined}
+              aria-invalid={errors.email !== undefined}
+              aria-describedby={errors.email ? "login-email-error" : undefined}
+              className="w-full"
+              {...register("email")}
+            />
+          </Field>
+
+          <Field htmlFor="login-password" label="Contraseña" error={errors.password?.message}>
+            <Input
+              id="login-password"
+              type="password"
+              autoComplete="current-password"
+              invalid={errors.password !== undefined}
+              aria-invalid={errors.password !== undefined}
+              aria-describedby={errors.password ? "login-password-error" : undefined}
+              className="w-full"
+              {...register("password")}
+            />
+          </Field>
+
+          {login.error !== null && (
+            <p role="alert" className="text-sm text-rose-400">
+              {describeError(login.error)}
             </p>
           )}
-        </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="login-password" className="text-sm font-medium">
-            Contraseña
-          </label>
-          <input
-            id="login-password"
-            type="password"
-            autoComplete="current-password"
-            aria-invalid={errors.password !== undefined}
-            aria-describedby={errors.password ? "login-password-error" : undefined}
-            className={inputClass}
-            {...register("password")}
-          />
-          {errors.password !== undefined && (
-            <p id="login-password-error" role="alert" className="text-sm text-red-600">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            className="w-full"
+            disabled={login.isPending}
+          >
+            {login.isPending ? "Entrando…" : "Entrar"}
+          </Button>
+        </form>
 
-        {login.error !== null && (
-          <p role="alert" className="text-sm text-red-600">
-            {describeError(login.error)}
-          </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={login.isPending}
-          className="rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+        <a
+          href={`${env.VITE_API_URL}/api/v1/auth/google`}
+          className={buttonClass("secondary", "md", "w-full")}
         >
-          {login.isPending ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
+          <GoogleIcon />
+          Continuar con Google
+        </a>
+      </Card>
 
-      <a
-        href={`${env.VITE_API_URL}/api/v1/auth/google`}
-        className="rounded border border-neutral-300 bg-white px-6 py-2.5 text-center text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-      >
-        Continuar con Google
-      </a>
-
-      <p className="text-sm text-neutral-600">
+      <p className="text-center text-sm text-neutral-400">
         ¿No tenés cuenta?{" "}
-        <Link to="/register" className="font-medium underline">
+        <Link
+          to="/register"
+          className="font-medium text-brand-300 underline underline-offset-4 hover:text-brand-200"
+        >
           Crear cuenta
         </Link>
       </p>

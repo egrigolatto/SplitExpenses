@@ -1,36 +1,40 @@
 import { Link } from "react-router";
 
+import { buttonClass } from "../components/ui/button-styles";
 import { useSession } from "../hooks/use-session";
 
 export function HomePage() {
   const { user } = useSession();
 
   return (
-    <section className="flex flex-col items-center gap-6 pt-12 text-center">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Split Expenses</h1>
-        <p className="text-neutral-600">
-          Repartí gastos entre varias personas y saldá deudas con el mínimo de transferencias.
-        </p>
-      </div>
+    <>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 bg-[radial-gradient(70%_55%_at_50%_42%,rgba(139,92,246,0.32),rgba(124,58,237,0.12)_45%,transparent_78%)]"
+      />
 
-      <div className="flex flex-wrap justify-center gap-3">
-        <Link
-          to="/reuniones/nueva"
-          className="rounded bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2"
-        >
-          Nueva reunión
-        </Link>
+      <section className="relative flex min-h-[70dvh] flex-col items-center justify-center px-4 text-center">
+        <div className="relative flex flex-col items-center gap-3">
+          <h1 className="bg-gradient-to-b from-white via-brand-100 to-brand-300 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-6xl">
+            Split Expenses
+          </h1>
+          <p className="max-w-md text-balance text-lg text-neutral-300">
+            Repartí gastos entre varias personas y saldá deudas con el mínimo de transferencias.
+          </p>
 
-        {user !== null && (
-          <Link
-            to="/mis-reuniones"
-            className="rounded border border-neutral-300 bg-white px-6 py-2.5 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-1"
-          >
-            Mis reuniones
-          </Link>
-        )}
-      </div>
-    </section>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link to="/reuniones/nueva" className={buttonClass("primary", "md")}>
+              Nueva reunión
+            </Link>
+
+            {user !== null && (
+              <Link to="/mis-reuniones" className={buttonClass("secondary", "md")}>
+                Mis reuniones
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

@@ -8,7 +8,7 @@ interface TransfersListProps {
 export function TransfersList({ transfers }: TransfersListProps) {
   if (transfers.length === 0) {
     return (
-      <p className="text-sm text-neutral-600">
+      <p className="text-sm text-neutral-400">
         Todos los saldos están al día. No hace falta ninguna transferencia.
       </p>
     );
@@ -19,14 +19,16 @@ export function TransfersList({ transfers }: TransfersListProps) {
       {transfers.map((transfer, index) => (
         <li
           key={`${transfer.from}-${transfer.to}-${index}`}
-          className="flex items-center justify-between gap-3 rounded border border-neutral-200 bg-white px-4 py-3 text-sm"
+          className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm"
         >
-          <span>
-            <strong>{transfer.from}</strong>
-            <span className="text-neutral-500"> paga a </span>
-            <strong>{transfer.to}</strong>
+          <span className="min-w-0 break-words">
+            <strong className="font-semibold text-white">{transfer.from}</strong>
+            <span className="text-neutral-400"> paga a </span>
+            <strong className="font-semibold text-white">{transfer.to}</strong>
           </span>
-          <span className="font-semibold">{formatAmount(transfer.amount)}</span>
+          <span className="font-semibold text-brand-200 tabular-nums">
+            {formatAmount(transfer.amount)}
+          </span>
         </li>
       ))}
     </ol>

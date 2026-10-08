@@ -7,8 +7,8 @@ export function ProtectedRoute() {
 
   if (isLoading) {
     return (
-      <p role="status" className="text-sm text-neutral-600">
-        Cargando sesión...
+      <p role="status" className="text-sm text-neutral-400">
+        Cargando sesión…
       </p>
     );
   }

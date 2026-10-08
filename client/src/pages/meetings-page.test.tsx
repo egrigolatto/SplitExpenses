@@ -1,12 +1,18 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useLocation } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { MeetingWithParticipants } from "../schemas/meeting.schema";
 import { meetingsService } from "../services/meetings.service";
 import { MeetingsPage } from "./meetings-page";
+
+function LocationProbe() {
+  const { search } = useLocation();
+
+  return <span data-testid="ubicacion">{`search:${search}`}</span>;
+}
 
 vi.mock("../services/meetings.service", () => ({
   meetingsService: {
@@ -46,15 +52,16 @@ function pageFixture(items: MeetingWithParticipants[], page: number, totalPages:
   return { items, page, limit: 10, total: totalPages * 10, totalPages };
 }
 
-function renderPage() {
+function renderPage(initialPath = "/mis-reuniones") {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 
   render(
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={["/mis-reuniones"]}>
+      <MemoryRouter initialEntries={[initialPath]}>
         <MeetingsPage />
+        <LocationProbe />
       </MemoryRouter>
     </QueryClientProvider>,
   );
@@ -105,7 +112,7 @@ describe("MeetingsPage", () => {
     expect(screen.queryByRole("navigation")).toBeNull();
   });
 
-  it("pagedeando pide la siguiente pagina al server", async () => {
+  it("cambia de pagina y refleja el cambio en la URL", async () => {
     const user = userEvent.setup();
     vi.mocked(meetingsService.list).mockImplementation((query) =>
       Promise.resolve(
@@ -127,13 +134,35 @@ describe("MeetingsPage", () => {
 
     await screen.findByText("Primera");
     expect(screen.getByRole("button", { name: "Anterior" })).toBeDisabled();
+    expect(screen.getByTestId("ubicacion")).toHaveTextContent("search:");
 
     await user.click(screen.getByRole("button", { name: "Siguiente" }));
 
     expect(await screen.findByText("Segunda")).toBeInTheDocument();
     expect(meetingsService.list).toHaveBeenCalledWith({ page: 2, limit: 10 });
+    expect(screen.getByTestId("ubicacion")).toHaveTextContent("search:?page=2");
     expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
     expect(screen.getByText(/Página 2 de 2/)).toBeInTheDocument();
+  });
+
+  it("abre directo en la pagina indicada por la URL", async () => {
+    vi.mocked(meetingsService.list).mockImplementation((query) =>
+      Promise.resolve(
+        query?.page === 2
+          ? pageFixture(
+              [meetingFixture({ id: "c0000000-0000-4000-8000-000000000003", name: "Pagina dos" })],
+              2,
+              2,
+            )
+          : pageFixture([], 1, 2),
+      ),
+    );
+
+    renderPage("/mis-reuniones?page=2");
+
+    expect(await screen.findByText("Pagina dos")).toBeInTheDocument();
+    expect(meetingsService.list).toHaveBeenCalledWith({ page: 2, limit: 10 });
+    expect(screen.getByRole("button", { name: "Anterior" })).toBeEnabled();
   });
 
   it("informa errores al cargar el historial", async () => {

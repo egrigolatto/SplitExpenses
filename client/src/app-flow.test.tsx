@@ -85,7 +85,7 @@ async function renderApp(path: string) {
 
   render(<App />);
 
-  await waitFor(() => expect(screen.queryByText("Cargando...")).toBeNull());
+  await waitFor(() => expect(screen.queryByText("Cargando…")).toBeNull());
 }
 
 async function fillAsado(user: ReturnType<typeof userEvent.setup>) {
