@@ -105,6 +105,10 @@ describe("RootLayout", () => {
       "href",
       "/mis-reuniones",
     );
+    expect(within(nav).getByRole("link", { name: "Estadísticas" })).toHaveAttribute(
+      "href",
+      "/estadisticas",
+    );
     expect(within(nav).getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
   });
 

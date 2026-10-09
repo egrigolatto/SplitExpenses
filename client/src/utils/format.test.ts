@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { formatAmount, formatDate, formatMeetingDate } from "./format";
+import {
+  formatAmount,
+  formatDate,
+  formatMeetingDate,
+  formatMonthAxisLabel,
+  formatMonthLabel,
+} from "./format";
 
 describe("formatAmount", () => {
   it("formatea enteros con dos decimales", () => {
@@ -33,5 +39,19 @@ describe("formatMeetingDate", () => {
 describe("formatDate", () => {
   it("formatea una Date local", () => {
     expect(formatDate(new Date(2025, 9, 10))).toBe("10/10/2025");
+  });
+});
+
+describe("formatMonthLabel", () => {
+  it("convierte una clave YYYY-MM en etiqueta larga en español", () => {
+    expect(formatMonthLabel("2026-10")).toBe("octubre de 2026");
+    expect(formatMonthLabel("2026-1")).toBe("2026-1");
+  });
+});
+
+describe("formatMonthAxisLabel", () => {
+  it("abrevia una clave YYYY-MM para el eje del grafico", () => {
+    expect(formatMonthAxisLabel("2026-10")).toBe("10/26");
+    expect(formatMonthAxisLabel("2027-1")).toBe("2027-1");
   });
 });

@@ -40,9 +40,17 @@ export function MeetingsPage() {
     <section className="flex flex-col gap-6">
       <header className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold tracking-tight">Mis reuniones</h1>
-        <Link to="/reuniones/nueva" className={buttonClass("secondary", "sm")}>
-          Nueva reunión
-        </Link>
+        <div className="flex shrink-0 items-center gap-3 text-sm">
+          <Link
+            to="/estadisticas"
+            className="rounded-lg font-medium text-neutral-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-400"
+          >
+            Estadísticas
+          </Link>
+          <Link to="/reuniones/nueva" className={buttonClass("secondary", "sm")}>
+            Nueva reunión
+          </Link>
+        </div>
       </header>
 
       {items.length === 0 && (

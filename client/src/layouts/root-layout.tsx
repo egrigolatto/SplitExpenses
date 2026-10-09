@@ -52,6 +52,9 @@ export function RootLayout() {
                   <span className="sm:hidden">Reuniones</span>
                   <span className="hidden sm:inline">Mis reuniones</span>
                 </Link>
+                <Link to="/estadisticas" className={`${navLinkClass} hidden sm:inline`}>
+                  Estadísticas
+                </Link>
                 <span className="hidden max-w-[10rem] truncate font-medium text-neutral-300 sm:inline">
                   {user.name}
                 </span>

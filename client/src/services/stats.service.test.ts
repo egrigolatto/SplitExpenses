@@ -5,21 +5,20 @@ import { statsResponseSchema, type StatsResponse } from "../schemas/stats.schema
 import { http } from "./http-client";
 import { statsService } from "./stats.service";
 
-function period(key: string, meetings = 0, amount = 0) {
-  return { key, meetings, amount };
-}
-
 function statsFixture(): StatsResponse {
   return {
-    total: { meetings: 3, amount: 640.5 },
+    total: { meetings: 3, amount: 640.5, myAmount: 213.5 },
     current: {
-      month: period("2026-10", 1, 340.5),
-      year: period("2026", 2, 440.5),
+      month: { key: "2026-10", meetings: 1, amount: 340.5 },
+      year: { key: "2026", meetings: 2, amount: 440.5 },
     },
     averagePerMeeting: 213.5,
-    monthly: Array.from({ length: 12 }, (_, index) =>
-      period(`2026-${String(index + 1).padStart(2, "0")}`),
-    ),
+    monthly: Array.from({ length: 12 }, (_, index) => ({
+      key: `2026-${String(index + 1).padStart(2, "0")}`,
+      meetings: 0,
+      amount: 0,
+      myAmount: 0,
+    })),
   };
 }
 
@@ -64,7 +63,7 @@ describe("statsResponseSchema", () => {
   it("rechaza importes negativos", () => {
     const broken = statsFixture();
 
-    broken.total = { meetings: 1, amount: -5 };
+    broken.total = { meetings: 1, amount: -5, myAmount: 0 };
 
     expect(statsResponseSchema.safeParse(broken).success).toBe(false);
   });
@@ -80,7 +79,7 @@ describe("statsService", () => {
       url: "/stats",
       params: { tz: "America/Argentina/Buenos_Aires" },
     });
-    expect(stats.total).toEqual({ meetings: 3, amount: 640.5 });
+    expect(stats.total).toEqual({ meetings: 3, amount: 640.5, myAmount: 213.5 });
 
     delete http.defaults.adapter;
   });

@@ -101,6 +101,11 @@ describe("MeetingsPage", () => {
     const second = screen.getByText("Viaje");
     expect(second.closest("li")).toHaveTextContent("05/01/2026");
     expect(second.closest("li")).toHaveTextContent(/\$\s?1\.234,50/);
+
+    expect(screen.getByRole("link", { name: "Estadísticas" })).toHaveAttribute(
+      "href",
+      "/estadisticas",
+    );
   });
 
   it("informa cuando todavia no hay reuniones guardadas", async () => {

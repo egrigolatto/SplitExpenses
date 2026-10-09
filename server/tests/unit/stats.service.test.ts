@@ -41,18 +41,25 @@ describe("buildMonthlySeries", () => {
         { key: "2026-08", meetings: 1, amount: 100 },
         { key: "2026-10", meetings: 2, amount: 340 },
       ],
+      [{ key: "2026-08", amount: 60 }],
       "2026-10",
     );
 
     expect(series).toHaveLength(12);
     expect(series[0]?.key).toBe("2025-11");
-    expect(series[0]).toEqual({ key: "2025-11", meetings: 0, amount: 0 });
+    expect(series[0]).toEqual({ key: "2025-11", meetings: 0, amount: 0, myAmount: 0 });
     expect(series.find((row) => row.key === "2026-09")).toEqual({
       key: "2026-09",
       meetings: 0,
       amount: 0,
+      myAmount: 0,
     });
-    expect(series.at(-1)).toEqual({ key: "2026-10", meetings: 2, amount: 340 });
-    expect(series.find((row) => row.key === "2026-08")?.amount).toBe(100);
+    expect(series.at(-1)).toEqual({ key: "2026-10", meetings: 2, amount: 340, myAmount: 0 });
+    expect(series.find((row) => row.key === "2026-08")).toEqual({
+      key: "2026-08",
+      meetings: 1,
+      amount: 100,
+      myAmount: 60,
+    });
   });
 });

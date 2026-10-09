@@ -337,13 +337,17 @@ const statsPeriodSchema = z.object({
   amount: z.number(),
 });
 
+const statsMonthSchema = statsPeriodSchema.extend({
+  myAmount: z.number(),
+});
+
 const statsSchema = registry.register(
   "Stats",
   z.object({
-    total: statsPeriodSchema.omit({ key: true }),
+    total: statsPeriodSchema.omit({ key: true }).extend({ myAmount: z.number() }),
     current: z.object({ month: statsPeriodSchema, year: statsPeriodSchema }),
     averagePerMeeting: z.number(),
-    monthly: z.array(statsPeriodSchema),
+    monthly: z.array(statsMonthSchema),
   }),
 );
 

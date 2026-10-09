@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { db } from "../../src/db/index.js";
 import { meetings } from "../../src/db/schema/meetings.js";
+import { participants } from "../../src/db/schema/participants.js";
 import { zonedTodayParts } from "../../src/lib/timezone.js";
 import { addMonthsToKey, monthKey } from "../../src/services/stats.service.js";
 import { cleanDatabase, registerAndLogin, request } from "../helpers.js";
@@ -11,8 +12,27 @@ async function seedMeeting(
   meetingDate: string,
   totalAmount: string,
   name = "Seed",
+  selfPaidAmount?: string,
 ) {
-  await db.insert(meetings).values({ ownerId, name, meetingDate, totalAmount });
+  const [meeting] = await db
+    .insert(meetings)
+    .values({ ownerId, name, meetingDate, totalAmount })
+    .returning();
+
+  if (!meeting) {
+    throw new Error("no meeting created");
+  }
+
+  if (selfPaidAmount !== undefined) {
+    await db.insert(participants).values({
+      meetingId: meeting.id,
+      userId: ownerId,
+      name: "Yo",
+      paidAmount: selfPaidAmount,
+    });
+  }
+
+  return meeting.id;
 }
 
 function currentKeys() {
@@ -37,7 +57,7 @@ describe("Stats endpoint", () => {
       const twoMonthsAgo = addMonthsToKey(currentMonth, -2);
       const lastYearJune = `${Number(yearKey) - 1}-06`;
 
-      await seedMeeting(id!, `${currentMonth}-08`, "340.50", "Mes actual");
+      await seedMeeting(id!, `${currentMonth}-08`, "340.50", "Mes actual", "200.50");
       await seedMeeting(id!, `${twoMonthsAgo}-14`, "100", "Hace dos meses");
       await seedMeeting(id!, `${lastYearJune}-15`, "200", "Año pasado");
 
@@ -46,7 +66,7 @@ describe("Stats endpoint", () => {
       expect(res.body).toHaveProperty("success", true);
       const data = res.body.data;
 
-      expect(data.total).toMatchObject({ meetings: 3, amount: 640.5 });
+      expect(data.total).toMatchObject({ meetings: 3, amount: 640.5, myAmount: 200.5 });
       expect(data.current.month).toMatchObject({ key: currentMonth, meetings: 1, amount: 340.5 });
       expect(data.current.year.key).toBe(yearKey);
       expect(data.current.year.meetings).toBe(2);
@@ -54,9 +74,16 @@ describe("Stats endpoint", () => {
 
       expect(data.monthly).toHaveLength(12);
       expect(data.monthly[0]?.key).toBe(addMonthsToKey(currentMonth, -11));
-      expect(data.monthly.at(-1)).toMatchObject({ key: currentMonth, meetings: 1 });
+      expect(data.monthly.at(-1)).toMatchObject({
+        key: currentMonth,
+        meetings: 1,
+        myAmount: 200.5,
+      });
       expect(data.monthly.find((row: { key: string }) => row.key === twoMonthsAgo)?.amount).toBe(
         100,
+      );
+      expect(data.monthly.find((row: { key: string }) => row.key === twoMonthsAgo)?.myAmount).toBe(
+        0,
       );
       expect(
         data.monthly.find((row: { key: string }) => row.key === addMonthsToKey(currentMonth, -1))
@@ -70,22 +97,31 @@ describe("Stats endpoint", () => {
       const res = await agent.get("/api/v1/stats?tz=UTC").expect(200);
       const data = res.body.data;
 
-      expect(data.total).toEqual({ meetings: 0, amount: 0 });
+      expect(data.total).toEqual({ meetings: 0, amount: 0, myAmount: 0 });
       expect(data.current.month.meetings).toBe(0);
       expect(data.current.year.meetings).toBe(0);
       expect(data.averagePerMeeting).toBe(0);
-      expect(data.monthly.every((row: { meetings: number; amount: number }) => row.meetings === 0));
+      expect(
+        data.monthly.every(
+          (row: { meetings: number; amount: number; myAmount: number }) =>
+            row.meetings === 0 && row.amount === 0 && row.myAmount === 0,
+        ),
+      ).toBe(true);
     });
 
     it("does not leak stats of other users", async () => {
       const first = await registerAndLogin();
       const second = await registerAndLogin();
 
-      await seedMeeting(first.id!, "2026-05-10", "500");
+      await seedMeeting(first.id!, "2026-05-10", "500", "Solo de A", "500");
 
       const res = await second.agent.get("/api/v1/stats?tz=UTC").expect(200);
 
-      expect(res.body.data.total).toEqual({ meetings: 0, amount: 0 });
+      expect(res.body.data.total).toEqual({ meetings: 0, amount: 0, myAmount: 0 });
+
+      const own = await first.agent.get("/api/v1/stats?tz=UTC").expect(200);
+
+      expect(own.body.data.total).toMatchObject({ meetings: 1, amount: 500, myAmount: 500 });
     });
 
     it("requires authentication", async () => {

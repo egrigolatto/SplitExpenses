@@ -26,3 +26,25 @@ export function formatMeetingDate(value: string): string {
 
   return formatDate(new Date(value));
 }
+
+const monthLongFormatter = new Intl.DateTimeFormat("es-AR", { month: "long", year: "numeric" });
+
+export function formatMonthLabel(key: string): string {
+  const month = /^(\d{4})-(\d{2})$/.exec(key);
+
+  if (month?.[1] !== undefined && month[2] !== undefined) {
+    return monthLongFormatter.format(new Date(Number(month[1]), Number(month[2]) - 1, 1));
+  }
+
+  return key;
+}
+
+export function formatMonthAxisLabel(key: string): string {
+  const month = /^(\d{4})-(\d{2})$/.exec(key);
+
+  if (month?.[1] === undefined || month[2] === undefined) {
+    return key;
+  }
+
+  return `${month[2]}/${month[1].slice(2)}`;
+}

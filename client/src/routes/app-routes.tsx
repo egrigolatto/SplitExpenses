@@ -28,6 +28,7 @@ const MeetingDetailPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import("../pages/not-found-page").then((m) => ({ default: m.NotFoundPage })),
 );
+const StatsPage = lazy(() => import("../pages/stats-page").then((m) => ({ default: m.StatsPage })));
 
 export const appRoutes = createBrowserRouter([
   {
@@ -44,6 +45,7 @@ export const appRoutes = createBrowserRouter([
         children: [
           { path: "mis-reuniones", element: <MeetingsPage /> },
           { path: "mis-reuniones/:id", element: <MeetingDetailPage /> },
+          { path: "estadisticas", element: <StatsPage /> },
         ],
       },
       { path: "*", element: <NotFoundPage /> },
