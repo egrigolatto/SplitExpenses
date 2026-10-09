@@ -4,13 +4,23 @@ Backend de Split Expenses: API REST construida con Express 5, TypeScript, Drizzl
 
 ## Stack
 
-- **Runtime:** Node.js 24 + TypeScript (ESM)
-- **Framework:** Express 5
-- **Base de datos:** PostgreSQL + Drizzle ORM
-- **Auth:** JWT (access + refresh con rotación y detección de reuso), cookies HttpOnly, Google OAuth
-- **Validación:** Zod 4
-- **Testing:** Vitest + Supertest
-- **Logging:** pino + pino-http
+| Biblioteca                           | Qué resuelve en esta API                                                                                                                |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Express 5                            | Framework HTTP: rutas versionadas (`/api/v1`), middlewares y controladores                                                              |
+| PostgreSQL + Drizzle ORM + pg        | Persistencia tipada (users, meetings, participants, refresh_tokens) y agregaciones SQL de `/stats` (COUNT/SUM/GROUP BY)                 |
+| drizzle-kit                          | Migraciones generadas desde el schema (`pnpm db:generate/migrate/studio`)                                                               |
+| Zod                                  | Validación en el borde: env (`env.schema`), bodies, queries y params vía el middleware `validate`                                       |
+| Argon2                               | Hash y verificación de contraseñas en registro/login                                                                                    |
+| jsonwebtoken                         | Tokens con dos claves separadas: access (15 min, stateless) y refresh (30 días)                                                         |
+| cookie-parser + `lib/cookies.ts`     | Sesión en cookies HttpOnly; `Path` restringido para el refresh; `SameSite` configurable (`COOKIE_SAME_SITE=none` para front cross-site) |
+| Google OAuth (`google-auth-library`) | Login social con `googleapis`; vincula o crea usuario y emite la misma sesión                                                           |
+| Helmet                               | Headers de seguridad HTTP                                                                                                               |
+| CORS                                 | Permite únicamente `FRONTEND_URL` con `credentials` (cookies cross-origin)                                                              |
+| express-rate-limit                   | Límite de requests por IP (`apiLimiter`) para abuso/credential stuffing                                                                 |
+| Pino + pino-http                     | Logging estructurado por request con redacción de cookies/authorization                                                                 |
+| zod-to-openapi + Swagger UI          | Documentación OpenAPI generada desde los mismos schemas, servida en `/docs`                                                             |
+| Vitest + Supertest                   | Tests unitarios y de integración corriendo la app real contra PostgreSQL (rotación/reuso de refresh incluido)                           |
+| dotenv                               | Variables de entorno antes de validar con Zod (fail-fast al boot)                                                                       |
 
 ## Setup local
 

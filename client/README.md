@@ -4,15 +4,22 @@ SPA de Split Expenses: repartimiento de gastos entre personas, construida con Re
 
 ## Stack
 
-- **Build/Dev:** Vite 8
-- **UI:** React 19 + Tailwind CSS 4
-- **Routing:** React Router 7
-- **Estado del servidor:** TanStack Query
-- **Estado de UI:** Zustand
-- **Formularios:** React Hook Form + Zod (con `@hookform/resolvers`)
-- **HTTP:** Axios (cookies HttpOnly con `withCredentials`)
-- **Testing:** Vitest + React Testing Library
-- **Calidad:** ESLint (flat config) + Prettier + husky/lint-staged (hooks en la raíz del repo)
+| Biblioteca                            | Qué resuelve en esta app                                                                                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| React 19                              | UI con hooks; las páginas se cargan de forma perezosa (`React.lazy`), cada ruta es su propio chunk                                                           |
+| TypeScript (`strict`)                 | Tipado estricto; cero `any`                                                                                                                                  |
+| Vite 8                                | Dev server con HMR y build a `dist/`; el `VITE_API_URL` se embebe al build                                                                                   |
+| React Router                          | Rutas del SPA, layout con `<Outlet/>`, guardas (`ProtectedRoute`) y paginación reflejada en la URL (`?page=`)                                                |
+| TanStack Query                        | Único dueño del estado del servidor: sesión (`/auth/me`), reuniones (`["meetings", {page}]`) y estadísticas (`["stats", tz]`); mutaciones invalidan la caché |
+| Zustand                               | Estado de UI: el draft de reunión que viaja del formulario al resumen (`store/meeting-draft.ts`)                                                             |
+| React Hook Form + @hookform/resolvers | Formularios: participantes dinámicos con `useFieldArray`, errores inline, submit validado por Zod                                                            |
+| Zod                                   | Contratos declarados una vez: env, formularios y shapes de las respuestas de la API (con `z.infer` como tipos)                                               |
+| Axios                                 | `services/http-client.ts`: `withCredentials`, envelope `{success,data}` validado y refresh single-flight ante 401                                            |
+| Tailwind CSS 4                        | Sistema de diseño: tokens violeta/ink en `index.css` (`@theme`), tema oscuro, mobile-first                                                                   |
+| Recharts                              | `/estadisticas`: barras de gasto mensual con overlay de "lo que pagaste" (`components/monthly-bar-chart.tsx`)                                                |
+| Vitest + Testing Library              | Tests por comportamiento (queries por rol/label) con `services/` mockeados; jsdom por archivo (aislamiento on)                                               |
+
+Calidad: ESLint (flat config, react-hooks + react-refresh) + Prettier; husky/lint-staged corren desde la raíz del repo.
 
 ## Setup local
 
@@ -67,8 +74,8 @@ src/
 ├── components/   # componentes reutilizables (filas de participantes, tablas, listas)
 ├── pages/        # una pantalla por ruta
 ├── layouts/      # RootLayout: header + <Outlet/>
-├── hooks/        # use-session (auth), use-meetings (queries/mutaciones)
-├── services/     # axios + auth/meetings/health; único lugar que toca HTTP
+├── hooks/        # use-session (auth), use-meetings, use-stats (queries/mutaciones)
+├── services/     # axios + auth/meetings/health/stats; único lugar que toca HTTP
 ├── store/        # Zustand: draft de reunión (UI state)
 ├── schemas/      # Zod: formularios + respuestas de API
 ├── types/        # tipos de dominio

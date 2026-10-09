@@ -291,49 +291,47 @@ Regla de estado: TanStack Query es el único dueño del estado que viene de la A
 
 ## Frontend
 
-| Herramienta | Propósito |
-|-------------|-----------|
-| React 19 | Biblioteca principal |
-| TypeScript | Tipado estático |
-| Vite | Build Tool |
-| React Router | Enrutamiento |
-| TanStack Query | Estado del servidor |
-| Zustand | Estado de la interfaz |
-| React Hook Form | Manejo de formularios |
-| Zod | Validación |
-| Axios | Cliente HTTP |
-| Tailwind CSS | Estilos |
+| Herramienta | Para qué se usa en Split Expenses |
+|-------------|-----------------------------------|
+| React 19 | SPA: componentes, hooks y rutas perezosas (cada página es un chunk aparte) |
+| TypeScript | Tipado estático en modo `strict` en todo el código |
+| Vite | Dev server con hot reload y build de producción a `dist/` |
+| React Router | Rutas (`/`, `/login`, `/register`, `/reuniones/*`, `/mis-reuniones/*`, `/estadisticas`), guards y navegación sin recarga |
+| TanStack Query | Estado del servidor: sesión, reuniones paginadas y estadísticas, con caché e invalidación |
+| Zustand | Estado de la interfaz: el draft de reunión entre formulario y resumen |
+| React Hook Form + @hookform/resolvers | Formularios (participantes dinámicos, auth) validados con Zod |
+| Zod | Un único lugar para validar: variables de entorno, formularios y respuestas de la API |
+| Axios | Cliente HTTP con cookies de sesión y renovación automática (refresh) ante 401 |
+| Tailwind CSS | Sistema de diseño: tokens de tema violeta/ink, tema oscuro y responsive |
+| Recharts | Gráfico de `/estadisticas`: gasto mensual total vs. lo que pagaste |
 
 ## Backend
 
-| Herramienta | Propósito |
-|-------------|-----------|
-| Express | Framework HTTP |
-| TypeScript | Tipado |
-| PostgreSQL | Base de datos |
-| Drizzle ORM | ORM tipado |
-| Zod | Validación |
-| Argon2 | Hash de contraseñas |
-| JWT | Autenticación |
-| Cookies HttpOnly | Manejo seguro de sesiones |
-| Google OAuth | Login social |
-| Pino | Logging |
-| Helmet | Seguridad HTTP |
-| express-rate-limit | Protección contra abuso |
-| CORS | Control de acceso |
-| dotenv | Variables de entorno |
+| Herramienta | Para qué se usa en Split Expenses |
+|-------------|-----------------------------------|
+| Express 5 | Framework HTTP: rutas → controladores → services → repositories |
+| PostgreSQL + Drizzle ORM | Persistencia de usuarios, reuniones y tokens; agregaciones SQL de estadísticas (COUNT/SUM/GROUP BY) |
+| Zod | Validación de env, bodies y queries; contrato del envelope `{success, data}` |
+| Argon2 | Hash de contraseñas en registro/login |
+| JWT | Access token (15 min) + refresh token (30 días) con rotación y detección de reuso |
+| Cookies HttpOnly | Sesión sin acceso JS; `SameSite` configurable (`COOKIE_SAME_SITE`) para front cross-site |
+| google-auth-library | Login con Google (OAuth) |
+| Helmet + CORS + express-rate-limit | Headers de seguridad, origen del frontend permitido con credentials, límite de abuso |
+| Pino + pino-http | Logging estructurado con redacción de cookies/tokens |
+| zod-to-openapi + Swagger UI | Documentación viva del API en `/docs` |
+| dotenv | Carga de variables antes de la validación de env |
 
 ## Calidad
 
-- ESLint
-- Prettier
-- Husky
-- lint-staged
-- Vitest
-- React Testing Library
-- Supertest
-- Docker
-- GitHub Actions
+| Herramienta | Para qué se usa |
+|-------------|-----------------|
+| ESLint + Prettier | Lint y formato, ambos proyectos con la misma base |
+| Husky + lint-staged | Pre-commit en la raíz: corre verificaciones de `server/` y/o `client/` según los archivos staged |
+| Vitest + React Testing Library | Tests unitarios y de componentes del frontend |
+| Vitest + Supertest | Tests unitarios e integración del API contra PostgreSQL real |
+| Docker | DB, perfiles dev (hot reload) y prod (imagen Node mínima + nginx) |
+| GitHub Actions | CI con jobs paralelos de `server` y `client` en todo PR |
+| Render | Despliegue automatizado vía blueprint (`render.yaml`): API + static site |
 
 ---
 
