@@ -331,6 +331,45 @@ registry.registerPath({
   },
 });
 
+const statsPeriodSchema = z.object({
+  key: z.string(),
+  meetings: z.number(),
+  amount: z.number(),
+});
+
+const statsSchema = registry.register(
+  "Stats",
+  z.object({
+    total: statsPeriodSchema.omit({ key: true }),
+    current: z.object({ month: statsPeriodSchema, year: statsPeriodSchema }),
+    averagePerMeeting: z.number(),
+    monthly: z.array(statsPeriodSchema),
+  }),
+);
+
+registry.registerPath({
+  method: "get",
+  path: "/stats",
+  tags: ["Stats"],
+  security: authed,
+  summary: "Aggregated spending statistics for the authenticated user",
+  description:
+    "Totals, current month/year (computed in the requester's time zone) and a 12-month series with gap-fill. Aggregation runs in PostgreSQL.",
+  request: {
+    query: z.object({
+      tz: z
+        .string()
+        .optional()
+        .openapi({ example: "America/Argentina/Buenos_Aires", description: "IANA time zone" }),
+    }),
+  },
+  responses: {
+    200: successResponse(statsSchema),
+    400: errorResponses[400],
+    401: errorResponses[401],
+  },
+});
+
 export function generateOpenApiDocument() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
