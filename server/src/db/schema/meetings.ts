@@ -28,5 +28,8 @@ export const meetings = pgTable(
 
     updatedAt: timestamp().defaultNow().notNull(),
   },
-  (table) => [index("idx_meetings_owner_created").on(table.ownerId, table.createdAt)],
+  (table) => [
+    index("idx_meetings_owner_created").on(table.ownerId, table.createdAt),
+    index("idx_meetings_owner_date").on(table.ownerId, table.meetingDate),
+  ],
 );

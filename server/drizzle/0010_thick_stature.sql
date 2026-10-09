@@ -1,0 +1,1 @@
+CREATE INDEX "idx_meetings_owner_date" ON "meetings" USING btree ("ownerId","meetingDate");

@@ -71,6 +71,13 @@
       "when": 1791494449242,
       "tag": "0009_supabase_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791544886765,
+      "tag": "0010_thick_stature",
+      "breakpoints": true
     }
   ]
 }
